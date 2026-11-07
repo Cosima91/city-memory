@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.7.1</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.8</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -875,40 +875,115 @@ function stampSeal(ctx,cw,ch){
   ctx.fillStyle='#fff';ctx.font='bold 15px serif';ctx.textAlign='center';
   ctx.fillText('城忆',cw-52,ch-50);ctx.fillText('监制',cw-52,ch-33);
 }
-/* 像素级风格化（纯 JS 实现，iOS/Safari 全兼容，不依赖 ctx.filter） */
-function pixStyle(cv,style){
-  const cx=cv.getContext('2d'),d=cx.getImageData(0,0,cv.width,cv.height),p=d.data;
-  for(let i=0;i<p.length;i+=4){
-    let r=p[i],g=p[i+1],b=p[i+2];const avg=(r+g+b)/3;
-    if(style==='gq'){ /* 国潮：高饱和 + 暖金色调 */
-      r=Math.max(0,Math.min(255,avg+(r-avg)*2.0+16));
-      g=Math.max(0,Math.min(255,avg+(g-avg)*1.75+4));
-      b=Math.max(0,Math.min(255,avg+(b-avg)*1.5-10));
-    }else if(style==='sm'){ /* 水墨：黑白高对比 */
-      const v=Math.max(0,Math.min(255,(r*0.3+g*0.59+b*0.11-128)*1.55+142));
-      r=g=b=v;
-    }else if(style==='jf'){ /* 剪纸：红/黑/宣纸三色量化 */
-      const lum=r*0.3+g*0.59+b*0.11;
-      if(lum>168){r=247;g=239;b=223}
-      else if(lum>92){r=178;g=56;b=44}
-      else{r=43;g=33;b=24}
-    }else{ /* 像素（xs）：高饱和锐化，配合缩小放大 */
-      r=Math.max(0,Math.min(255,avg+(r-avg)*1.6));
-      g=Math.max(0,Math.min(255,avg+(g-avg)*1.6));
-      b=Math.max(0,Math.min(255,avg+(b-avg)*1.6));
+/* ---------- 高级风格化引擎（像素级实现，iOS/Safari 全兼容，不依赖 ctx.filter） ---------- */
+function lumOf(r,g,b){return r*0.299+g*0.587+b*0.114}
+/* 多段色带映射：把照片亮度映射到"大师配色"上（电影调色同款技术） */
+function ramp(t,stops){
+  t=Math.max(0,Math.min(1,t));
+  for(let k=1;k<stops.length;k++){
+    if(t<=stops[k][0]){
+      const a=stops[k-1],b=stops[k],f=(t-a[0])/((b[0]-a[0])||1);
+      return [a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f,a[3]+(b[3]-a[3])*f];
     }
-    p[i]=r;p[i+1]=g;p[i+2]=b;
+  }
+  const s=stops[stops.length-1];return [s[1],s[2],s[3]];
+}
+const RAMPS={
+  /* 国潮：玄墨→朱砂→正红→鎏金→米白（故宫配色） */
+  gq:[[0,30,16,20],[.32,150,34,28],[.58,214,74,42],[.78,236,178,80],[1,250,240,218]],
+  /* 水墨：宣纸白→淡墨→中墨→浓墨（暖灰调，不死黑） */
+  sm:[[0,250,246,236],[.45,196,190,178],[.75,110,108,104],[1,36,35,40]],
+  /* 剪纸：宣纸→正红→深红→玄黑 */
+  jf:[[0,247,239,223],[.5,198,58,42],[.8,142,32,24],[1,32,24,20]],
+  xs:null /* 像素：16 色量化 + 抖动 */
+};
+const XSPAL=[[26,28,44],[68,58,112],[122,90,160],[196,120,90],[236,168,84],[250,222,120],[120,188,120],[64,140,120],[44,90,120],[90,160,196],[200,230,240],[244,246,250],[180,60,50],[250,120,100],[92,60,40],[160,200,90]];
+const BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+function styleFX(cv,style){
+  const cx=cv.getContext('2d'),w=cv.width,h=cv.height;
+  if(style==='sm'){ /* 水墨先做一次廉价模糊（1/4 降采样再放大），模拟墨晕 */
+    const sm=document.createElement('canvas');sm.width=Math.max(1,w>>2);sm.height=Math.max(1,h>>2);
+    sm.getContext('2d').drawImage(cv,0,0,sm.width,sm.height);
+    cx.imageSmoothingEnabled=true;cx.clearRect(0,0,w,h);cx.drawImage(sm,0,0,sm.width,sm.height,0,0,w,h);
+  }
+  const d=cx.getImageData(0,0,w,h),p=d.data;
+  const spread=style==='xs'?36:0; /* 像素风：拜耳 4×4 有序抖动幅度 */
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const i=(y*w+x)*4;
+      const r=p[i],g=p[i+1],b=p[i+2];
+      if(style==='xs'){
+        const dv=(BAYER[y&3][x&3]/16-.5)*spread;
+        let best=0,bd=1e9;
+        for(let k=0;k<XSPAL.length;k++){
+          const c=XSPAL[k],dr=c[0]-(r+dv),dg=c[1]-(g+dv),db=c[2]-(b+dv),dist=dr*dr+dg*dg+db*db;
+          if(dist<bd){bd=dist;best=k}
+        }
+        const c=XSPAL[best];p[i]=c[0];p[i+1]=c[1];p[i+2]=c[2];
+      }else{
+        const m=ramp(lumOf(r,g,b)/255,RAMPS[style]);
+        /* 保留 22% 原色信息：统一色调但不死板 */
+        p[i]=m[0]*.78+r*.22;p[i+1]=m[1]*.78+g*.22;p[i+2]=m[2]*.78+b*.22;
+      }
+    }
   }
   cx.putImageData(d,0,0);
 }
-/* 像素风专属：缩小 9 倍再最近邻放大，产生马赛克块 */
-function pixBlock(off,w,h){
-  const sm=document.createElement('canvas');sm.width=Math.max(4,Math.round(w/9));sm.height=Math.max(4,Math.round(h/9));
+/* 像素风专属：缩小再最近邻放大，产生大色块 */
+function pixBlock(off,w,h,n){
+  n=n||9;
+  const sm=document.createElement('canvas');sm.width=Math.max(4,Math.round(w/n));sm.height=Math.max(4,Math.round(h/n));
   const sctx=sm.getContext('2d');sctx.drawImage(off,0,0,sm.width,sm.height);
   const octx=off.getContext('2d');octx.imageSmoothingEnabled=false;
   octx.clearRect(0,0,w,h);octx.drawImage(sm,0,0,sm.width,sm.height,0,0,w,h);
   octx.imageSmoothingEnabled=true;
 }
+/* 统一管线：任意图源（用户照片 / AI 图）→ 指定风格成品，观感一致 */
+function renderStyled(img,w,h,style){
+  const off=document.createElement('canvas');off.width=w;off.height=h;
+  const octx=off.getContext('2d');
+  drawCover(octx,img,0,0,w,h);
+  if(style==='xs')pixBlock(off,w,h,Math.max(6,Math.round(w/30)));
+  styleFX(off,style);
+  return off;
+}
+/* 各风格的"装裱"：边框 + 装饰，一风格一个档次 */
+function frameStyle(ctx,style,x,y,w,h){
+  ctx.filter='none';
+  if(style==='gq'){ /* 国潮：外朱红内鎏金双线 + 四角金铆 */
+    ctx.strokeStyle='#8f2a20';ctx.lineWidth=5;ctx.beginPath();ctx.roundRect(x-3,y-3,w+6,h+6,40);ctx.stroke();
+    ctx.strokeStyle='#c9963c';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x+4,y+4,w-8,h-8,30);ctx.stroke();
+    ctx.fillStyle='#c9963c';
+    [[x+13,y+13],[x+w-13,y+13],[x+13,y+h-13],[x+w-13,y+h-13]].forEach(pt=>{
+      ctx.beginPath();ctx.arc(pt[0],pt[1],6,0,7);ctx.fill();
+    });
+  }else if(style==='sm'){ /* 水墨：细墨框 + 左下朱印「忆」 */
+    ctx.strokeStyle='#2a2a30';ctx.lineWidth=1.6;ctx.strokeRect(x-4,y-4,w+8,h+8);
+    ctx.fillStyle='#a5261c';ctx.fillRect(x+8,y+h-34,26,26);
+    ctx.fillStyle='#f5efe2';ctx.font='bold 17px serif';ctx.textAlign='center';ctx.fillText('忆',x+21,y+h-14);
+  }else if(style==='jf'){ /* 剪纸：锯齿花边（粗虚线）+ 四角折角 */
+    ctx.strokeStyle='#b03a2e';ctx.lineWidth=7;ctx.setLineDash([12,7]);
+    ctx.strokeRect(x-5,y-5,w+10,h+10);ctx.setLineDash([]);
+    ctx.fillStyle='#b03a2e';
+    ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+17,y-5);ctx.lineTo(x-5,y+17);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+w+5,y-5);ctx.lineTo(x+w-17,y-5);ctx.lineTo(x+w+5,y+17);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(x-5,y+h+5);ctx.lineTo(x+17,y+h+5);ctx.lineTo(x-5,y+h-17);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(x+w+5,y+h+5);ctx.lineTo(x+w-17,y+h+5);ctx.lineTo(x+w+5,y+h-17);ctx.closePath();ctx.fill();
+  }else{ /* 像素：黑底描边 + 内嵌白线（8-bit 电视框） */
+    ctx.fillStyle='#1a1c2c';
+    ctx.fillRect(x-6,y-6,w+12,4);ctx.fillRect(x-6,y+h+2,w+12,4);
+    ctx.fillRect(x-6,y-6,4,h+12);ctx.fillRect(x+w+2,y-6,4,h+12);
+    ctx.fillStyle='#f4f6fa';
+    ctx.fillRect(x-2,y-2,w+4,1);ctx.fillRect(x-2,y+h+1,w+4,1);
+  }
+}
+/* 按风格选 AI 提示词：让 AI 出图本身就贴风格 */
+const FP={
+  gq:'国潮插画海报：鎏金勾边，朱砂正红撞色，祥云纹样装饰，对称构图，故宫文创质感，',
+  sm:'中国水墨画：墨分五色，大面积留白，写意飞白笔触，宣纸质感，淡墨远山，',
+  jf:'中国民间剪纸艺术：正红镂空剪纸，对称窗花纹样，米白底色，纯色块无渐变，剪纸质感，',
+  xs:'复古像素艺术游戏画面：16 色像素块，8-bit 像素风，锐利色块，'
+};
 function genIP(){
   setStep(3);
   const c=document.getElementById('ipCanvas'),ctx=c.getContext('2d');
@@ -922,19 +997,20 @@ function genIP(){
   stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（本机结果已生成，AI 完成后自动替换）';
   const t0=Date.now();
   const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt='中国传统'+FN[curStyle]+'风格艺术插画海报：'+land+'，大幅艺术化重构，非照片写实，图案化装饰构图，鲜明笔触与色块，博物馆文创质感';
+  const prompt=FP[curStyle]+land+'，大幅艺术化重构，非照片写实，博物馆文创海报质感';
   aiImage(prompt,512,400).then(url=>{
     const img=new Image();
     img.onload=()=>{
       clearInterval(tick);
       ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
+      const w=300,h=200,x=(c.width-w)/2,y=22;
+      const off=renderStyled(img,w,h,curStyle); /* AI 图也过同一风格管线 */
       ctx.save();
-      const r=36,w=300,h=200,x=(c.width-w)/2,y=22;
-      ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.clip();
-      drawCover(ctx,img,x,y,w,h);
+      ctx.beginPath();ctx.roundRect(x,y,w,h,36);ctx.clip();
+      ctx.drawImage(off,x,y);
       ctx.restore();
-      ctx.strokeStyle='#b03a2e';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.stroke();
-      stampSeal(ctx,c.width,c.height);
+      frameStyle(ctx,curStyle,x,y,w,h);
+      if(curStyle!=='sm')stampSeal(ctx,c.width,c.height);
       ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='left';
       ctx.fillText(land+' · '+FN[curStyle]+'风 · AI 创作',16,c.height-20);
       stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
@@ -953,19 +1029,14 @@ function autoSaveLocal(c,stat,why){
 function ipLocal(ctx,c,stat,land,quiet){
   const img=new Image();
   img.onload=()=>{
-    const w=240,h=180;
-    const off=document.createElement('canvas');off.width=w;off.height=h;
-    const octx=off.getContext('2d');
-    drawCover(octx,img,0,0,w,h);
-    if(curStyle==='xs')pixBlock(off,w,h);
-    pixStyle(off,curStyle);
+    const w=240,h=180,x=(c.width-w)/2,y=26;
+    const off=renderStyled(img,w,h,curStyle);
     ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
-    const r=36,x=(c.width-w)/2,y=26;
-    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.clip();
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,36);ctx.clip();
     ctx.drawImage(off,x,y);
     ctx.restore();
-    ctx.strokeStyle='#b03a2e'; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke();
-    stampSeal(ctx,c.width,c.height);
+    frameStyle(ctx,curStyle,x,y,w,h);
+    if(curStyle!=='sm')stampSeal(ctx,c.width,c.height);
     ctx.fillStyle='#2b2118'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
     ctx.fillText(land+' · '+FN[curStyle]+'风', 16, c.height-24);
     if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机风格化合成（稍后可重试 AI 生成）';
