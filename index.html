@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>城忆 · 济南城市记忆地图（原型）</title>
+<style>
+  :root{
+    --ink:#2b2118; --paper:#faf6ef; --card:#ffffff; --line:#e8e0d2;
+    --red:#b03a2e; --gold:#c89b3c; --teal:#3d6b6b;
+    --muted:#8a7f6e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:#e9e2d5;font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
+    display:flex;justify-content:center;min-height:100vh;padding:18px 0}
+  .phone{width:400px;max-width:100vw;height:820px;background:var(--paper);
+    border-radius:36px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;
+    display:flex;flex-direction:column;position:relative;border:8px solid #1c1712}
+  /* header */
+  .hd{background:linear-gradient(135deg,#8e2f26,#b03a2e);color:#fff;padding:14px 16px 12px;flex-shrink:0}
+  .hd .brand{font-size:19px;font-weight:700;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+  .hd .brand span.seal{background:var(--gold);color:#5b3a00;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+  .hd .sub{font-size:11px;opacity:.85;margin-top:3px;letter-spacing:1px}
+  /* body scroll */
+  .bd{flex:1;overflow-y:auto;padding:14px 14px 90px}
+  .bd::-webkit-scrollbar{width:0}
+  /* tab pages */
+  .page{display:none}
+  .page.active{display:block;animation:fade .25s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* bottom nav */
+  .nav{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;flex-shrink:0;padding:6px 0 12px}
+  .nav button{flex:1;background:none;border:none;font-size:10.5px;color:var(--muted);cursor:pointer;padding:4px 0}
+  .nav button .ic{font-size:21px;display:block;margin-bottom:2px}
+  .nav button.on{color:var(--red);font-weight:700}
+  /* generic */
+  h2.sec{font-size:15px;margin:4px 0 10px;display:flex;align-items:center;gap:6px}
+  h2.sec::before{content:"";width:4px;height:15px;background:var(--red);border-radius:2px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:12px}
+  .chip{display:inline-block;font-size:10px;padding:2px 8px;border-radius:999px;background:#f2ead9;color:#7a5c14;margin-right:6px}
+  .chip.c1{background:#e8f0ea;color:#2f5d3a}.chip.c2{background:#fbeae7;color:#a13d2f}.chip.c3{background:#e9eef5;color:#31567d}
+  .btn{display:inline-block;background:var(--red);color:#fff;border:none;border-radius:10px;
+    padding:10px 16px;font-size:13px;cursor:pointer;font-weight:600}
+  .btn.gold{background:var(--gold);color:#4a3405}
+  .btn.ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+  .btn.sm{padding:6px 12px;font-size:11.5px;border-radius:8px}
+  .muted{color:var(--muted);font-size:11px;line-height:1.6}
+  .mt8{margin-top:8px}.mt12{margin-top:12px}
+  /* map */
+  .mapbox{background:linear-gradient(160deg,#dfe8dc,#eef3ec);border:1px solid #cfd8cc;border-radius:14px;
+    position:relative;height:340px;overflow:hidden;margin-bottom:12px}
+  .mapbox .grid{position:absolute;inset:0;
+    background-image:linear-gradient(#c9d6c8 1px,transparent 1px),linear-gradient(90deg,#c9d6c8 1px,transparent 1px);
+    background-size:34px 34px;opacity:.5}
+  .river{position:absolute;left:-20px;top:60px;width:480px;height:26px;background:#a9c4d4;border-radius:50%;
+    transform:rotate(-8deg);opacity:.7}
+  .river.r2{top:150px;transform:rotate(-4deg);opacity:.5;left:-40px}
+  .citytag{position:absolute;font-size:11px;color:#5c6b58;background:rgba(255,255,255,.8);
+    padding:1px 6px;border-radius:4px}
+  .pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;text-align:center;transition:.15s}
+  .pin .dot{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);margin:0 auto;
+    display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;
+    box-shadow:0 3px 6px rgba(0,0,0,.25);border:2px solid #fff}
+  .pin.jn .dot{background:var(--red)}
+  .pin.other .dot{background:#7d8f7d;width:20px;height:20px;font-size:10px}
+  .pin .lb{font-size:10px;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 5px;margin-top:3px;
+    white-space:nowrap;border:1px solid var(--line);color:#4a4033}
+  .pin.sel .dot{background:var(--gold)!important;transform:rotate(-45deg) scale(1.18)}
+  .pin.sel .lb{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .npin{transform:translate(-50%,-50%)}
+  .npin .dot{width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid #fff;
+    box-shadow:0 2px 4px rgba(0,0,0,.3);margin:0 auto}
+  .npin .lb{display:none;position:absolute;left:50%;transform:translateX(-50%);top:-17px}
+  .npin.sel .dot{background:var(--gold)!important;box-shadow:0 0 0 4px rgba(200,155,60,.3)}
+  .npin.sel .lb{display:block}
+  /* point detail */
+  .dlg-mask{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:30;display:none}
+  .dlg{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:31;
+    padding:16px 16px 20px;max-height:72%;overflow-y:auto;display:none;animation:up .25s}
+  @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .dlg .handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 12px}
+  .dlg h3{font-size:16px;margin-bottom:4px}
+  .dlg .close{position:absolute;right:14px;top:12px;font-size:18px;color:#999;cursor:pointer;background:none;border:none}
+  .tags{display:flex;gap:8px;margin:10px 0}
+  .tags button{flex:1;border:1.5px solid var(--line);background:#faf7f0;border-radius:10px;padding:8px 2px;
+    font-size:11px;cursor:pointer;color:#5a5040}
+  .tags button.on{border-color:var(--red);color:var(--red);background:#fdf1ef;font-weight:700}
+  .post{border-top:1px dashed var(--line);padding:9px 0;font-size:12px;line-height:1.6}
+  .post .who{color:var(--teal);font-weight:600;font-size:11px}
+  .post .pt{float:right;font-size:10px;color:var(--muted)}
+  .checkin{background:linear-gradient(90deg,#fdf3e3,#fbead0);border:1px solid #ecd9ae;border-radius:12px;
+    padding:10px 12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
+  /* mall */
+  .goods{display:flex;flex-wrap:wrap;gap:10px}
+  .g{width:calc(50% - 5px);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:11.5px}
+  .g .ph{height:84px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:7px}
+  .g .nm{font-weight:700;font-size:12px}
+  .g .pr{color:var(--red);font-weight:700;margin-top:3px}
+  .g .pr small{color:var(--muted);font-weight:400}
+  /* ip studio */
+  .steps{display:flex;gap:6px;margin-bottom:12px}
+  .steps div{flex:1;text-align:center;font-size:10.5px;color:var(--muted);padding:6px 2px;border-radius:8px;background:#f2ede2}
+  .steps div.on{background:var(--red);color:#fff;font-weight:700}
+  .drop{border:2px dashed #cbb;border-radius:14px;background:#fffdf8;height:120px;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:12px;cursor:pointer}
+  .styles{display:flex;gap:8px;margin:12px 0}
+  .styles button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 2px;
+    font-size:11px;cursor:pointer}
+  .styles button.on{border-color:var(--gold);background:#fdf6e3;color:#7a5c14;font-weight:700}
+  #ipCanvas{width:100%;border-radius:12px;border:1px solid var(--line);display:none}
+  /* info */
+  .doc{display:flex;justify-content:space-between;align-items:center;padding:11px 2px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}
+  .doc:last-child{border-bottom:none}
+  .doc .ic2{margin-right:7px}
+  /* course */
+  .lesson{display:flex;gap:10px;margin-bottom:11px}
+  .lesson .cover{width:86px;height:58px;border-radius:8px;background:#2b2118;color:var(--gold);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:22px}
+  .lesson .t{font-size:12.5px;font-weight:700;line-height:1.45}
+  .lesson .d{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .vip{background:linear-gradient(120deg,#2b2118,#4a3826);color:#f4e8cf;border-radius:14px;padding:13px;margin-bottom:12px}
+  .vip .b{font-weight:700;font-size:13px}.vip .s{font-size:10.5px;opacity:.8;margin-top:4px;line-height:1.6}
+  /* admin */
+  .adm{border-left:3px solid var(--gold);padding-left:9px;margin-bottom:12px}
+  .adm .st{font-size:10px;padding:1px 7px;border-radius:4px;margin-left:6px}
+  .st.w{background:#fbeae7;color:#a13d2f}.st.ok{background:#e8f0ea;color:#2f5d3a}
+  .badge-top{position:absolute;top:0;right:0;transform:translate(35%,-35%) rotate(45deg);background:var(--gold);
+    color:#4a3405;font-size:8.5px;font-weight:700;padding:14px 30px 3px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="hd">
+    <div class="brand">城忆 <span class="seal">原型演示</span></div>
+    <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
+  </div>
+
+  <div class="bd">
+    <!-- ===================== 页1 地图 ===================== -->
+    <div class="page active" id="pg-map">
+      <h2 class="sec">地图选点</h2>
+      <div style="display:flex;gap:6px;margin-bottom:10px;font-size:10.5px">
+        <span class="chip c1">① 古迹与考古遗址</span>
+        <span class="chip c2">② 历史建筑与街区</span>
+        <span class="chip c3">③ 博物馆</span>
+      </div>
+      <div class="card" style="padding:10px">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn sm" id="vNat" onclick="setView('nat')">🇨🇳 全国视图 · 34 省级区域</button>
+          <button class="btn ghost sm" id="vJn" onclick="setView('jn')">💧 济南试点详图</button>
+        </div>
+        <div id="natWrap">
+          <div class="muted" style="margin-bottom:8px"><b style="color:var(--teal)">全国视图</b>：各省份的首都/省会及著名大城市已标出，<b>仅开放基础地标</b>——讨论内容、老照片由用户自行上传。点击圆点查看。</div>
+          <div class="mapbox" id="natMap" style="height:380px">
+            <div class="grid"></div>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+              <path d="M18,30 L26,18 L38,28 L48,22 L56,26 L64,14 L70,6 L76,10 L74,20 L72,28 L75,32 L71,36 L74,38 L72,41 L73,45 L74,50 L75,52 L73,58 L70,63 L67,68 L62,70 L57,70 L52,74 L48,68 L45,72 L36,66 L26,68 L18,60 L14,48 L16,38 Z"
+                fill="#f3f0e6" stroke="#9db09b" stroke-width="0.7"/>
+              <ellipse cx="57" cy="79" rx="2.6" ry="1.8" fill="#f3f0e6" stroke="#9db09b" stroke-width="0.7"/>
+              <ellipse cx="76.5" cy="61" rx="1.6" ry="2.6" fill="#f3f0e6" stroke="#9db09b" stroke-width="0.7"/>
+            </svg>
+          </div>
+        </div>
+        <div id="jnWrap" style="display:none">
+          <div class="muted" style="margin-bottom:8px">
+            <b style="color:var(--red)">济南试点 · 内容详实</b>（古代+近代知名点位，官方建库）｜
+            其他城市仅开放基础地标，<b>内容由用户自行上传</b>
+          </div>
+          <div class="mapbox" id="map">
+            <div class="grid"></div>
+            <div class="river"></div><div class="river r2"></div>
+            <div class="citytag" style="left:52%;top:8%">黄河 →</div>
+            <div class="citytag" style="left:6%;top:40%">济南古城</div>
+            <div class="pin jn" style="left:38%;top:55%" data-p="0"><div class="dot">泉</div><div class="lb">趵突泉</div></div>
+            <div class="pin jn" style="left:52%;top:42%" data-p="1"><div class="dot">湖</div><div class="lb">大明湖·超然楼</div></div>
+            <div class="pin jn" style="left:58%;top:62%" data-p="2"><div class="dot">泉</div><div class="lb">黑虎泉</div></div>
+            <div class="pin jn" style="left:46%;top:48%" data-p="3"><div class="dot">街</div><div class="lb">曲水亭街</div></div>
+            <div class="pin jn" style="left:44%;top:64%" data-p="4"><div class="dot">站</div><div class="lb">老济南站钟楼</div></div>
+            <div class="pin jn" style="left:33%;top:44%" data-p="5"><div class="dot">博</div><div class="lb">市博物馆（原道院）</div></div>
+            <div class="pin jn" style="left:70%;top:34%" data-p="6"><div class="dot">教</div><div class="lb">洪家楼教堂</div></div>
+          </div>
+        </div>
+        <button class="btn ghost sm mt8" style="width:100%" onclick="go('pg-ip')">📍 我要上传新点位 / 投稿老照片</button>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin-top:0">打卡排行榜 · 积分累计</h2>
+        <div style="font-size:12px;line-height:2">
+          <div>🥇 泉客·阿济　<b style="color:var(--red)">127</b> 枚印章　·　趵突泉×23</div>
+          <div>🥈 老城拾遗　<b style="color:var(--red)">96</b> 枚　·　曲水亭街×11</div>
+          <div>🥉 明湖青年　<b style="color:var(--red)">81</b> 枚</div>
+        </div>
+        <div class="muted mt8">在点位 500 米范围内可定位打卡，集印章兑文创（商城页）</div>
+      </div>
+    </div>
+
+    <!-- ===================== 页2 资讯 ===================== -->
+    <div class="page" id="pg-info">
+      <h2 class="sec">常设栏 · 保护文件与热线</h2>
+      <div class="card">
+        <div class="doc" onclick="toast('已打开《威尼斯宪章》（演示）')"><span><span class="ic2">📜</span>《威尼斯宪章》（国际古迹保护宪章）</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('已打开《济南市历史文化名城保护条例》（演示）')"><span><span class="ic2">🏛️</span>《济南市历史文化名城保护条例》</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('已展示主管单位热线（演示）')"><span><span class="ic2">☎️</span> 市住建局名城保护处 / 文旅局文保科 热线</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('已打开《中国文物古迹保护准则》（演示）')"><span><span class="ic2">📕</span>《中国文物古迹保护准则》</span><span class="muted">›</span></div>
+      </div>
+      <h2 class="sec">资讯栏 · 随时可更新</h2>
+      <div class="card">
+        <div class="doc"><span><span class="ic2">🎙️</span> [讲座] 明府城考古发现分享会 · 周六 14:00</span><span class="muted">10/31</span></div>
+        <div class="doc"><span><span class="ic2">🖼️</span> [展览] 「泉城百年影像展」市博物馆开展</span><span class="muted">10/28</span></div>
+        <div class="doc"><span><span class="ic2">⛏️</span> [新闻] 济南新发现一处汉代墓葬群</span><span class="muted">10/25</span></div>
+        <div class="doc"><span><span class="ic2">📣</span> [代宣传] 城市考古夏令营开始报名（机构合作）</span><span class="muted">10/22</span></div>
+      </div>
+      <div class="muted" style="text-align:center">后台可随时发布 / 置顶 / 下线（见「我的-审核后台」）</div>
+    </div>
+
+    <!-- ===================== 页3 IP创作 ===================== -->
+    <div class="page" id="pg-ip">
+      <h2 class="sec">AI 文创工坊</h2>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn sm" id="mIp" onclick="setMode('ip')">🎨 点位 IP 创作</button>
+        <button class="btn ghost sm" id="mShot" onclick="setMode('shot')">📸 AI 旅拍 · 城市装扮</button>
+      </div>
+      <div id="ipFlow">
+      <div class="steps">
+        <div id="st1" class="on">① 上传照片</div><div id="st2">② 选择风格</div><div id="st3">③ 生成保存</div>
+      </div>
+      <div class="card">
+        <div id="step1">
+          <div class="drop" onclick="document.getElementById('f').click()">📷 点击上传点位照片<br><span style="font-size:10px">（演示可用任意图片；数据仅本地处理）</span></div>
+          <input type="file" id="f" accept="image/*" hidden>
+          <div class="muted mt8">支持：点位建筑照 / 老照片 / 手绘草图。上传即视为同意《二创授权协议》。</div>
+        </div>
+        <div id="step2" style="display:none">
+          <div style="text-align:center"><img id="srcImg" style="max-width:100%;max-height:150px;border-radius:10px;border:1px solid var(--line)"></div>
+          <div class="styles">
+            <button data-f="gq" class="on">国潮插画</button>
+            <button data-f="sm">水墨</button>
+            <button data-f="jf">剪纸</button>
+            <button data-f="xs">像素</button>
+          </div>
+          <button class="btn" style="width:100%" onclick="genIP()">✨ 开始生成</button>
+        </div>
+        <div id="step3" style="display:none;text-align:center">
+          <canvas id="ipCanvas" width="340" height="260"></canvas>
+          <div class="muted mt8">已生成你的专属点位 IP（演示效果，正式版接 AIGC 模型）</div>
+          <div class="mt12" style="display:flex;gap:8px">
+            <button class="btn gold" style="flex:1" onclick="saveIP()">💾 存入我的 IP 库</button>
+            <button class="btn ghost" style="flex:1" onclick="resetIP()">再做一张</button>
+          </div>
+        </div>
+      </div>
+      </div>
+      <!-- AI 旅拍 · 城市装扮（参考首都博物馆《AI旅拍》模式：风格选择→面部采集→AI实时合成） -->
+      <div id="shotFlow" style="display:none">
+        <div class="steps">
+          <div id="t1" class="on">① 风格选择</div><div id="t2">② 面部采集</div><div id="t3">③ AI 实时合成</div>
+        </div>
+        <div class="card">
+          <div id="shot1">
+            <div class="styles" id="shotStyles"></div>
+            <div class="muted">标准化快节奏流程：先选<b>城市主题底图</b>（可随展览/城市快速复用），再<b>面部采集</b>，AI 实时合成你的城市装扮形象——无需真实出行，"原地"穿越进老城。全程约 10 秒。</div>
+          </div>
+          <div id="shot2" style="display:none;text-align:center">
+            <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
+            <div class="drop" id="faceDrop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或上传正面照<br><span style="font-size:10px">（演示：图像仅本地处理，不上传）</span></div>
+            <input type="file" id="sf" accept="image/*" capture="user" hidden>
+            <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
+          </div>
+          <div id="shot3" style="display:none;text-align:center">
+            <canvas id="shotCanvas" width="340" height="420" style="display:none;width:100%;border-radius:12px;border:1px solid var(--line)"></canvas>
+            <div class="muted mt8">已合成你的城市装扮形象（演示效果，正式版接人脸融合模型）</div>
+            <div class="mt12" style="display:flex;gap:8px">
+              <button class="btn gold" style="flex:1" onclick="saveShot()">💾 存入旅拍册</button>
+              <button class="btn" style="flex:1" onclick="toast('订单已创建（演示）：现场取片 · ¥19.9 · 支持多种支付')">🖨️ 付费打印 ¥19.9</button>
+            </div>
+            <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」：分身动态将不定期推送（演示）')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
+            <button class="btn ghost sm mt8" style="width:100%" onclick="resetShot()">再拍一张</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin-top:0">我的 IP 库（<span id="ipN">0</span>）</h2>
+        <div id="ipList" class="goods"><div class="muted">还没有作品，去生成第一个吧</div></div>
+      </div>
+    </div>
+
+    <!-- ===================== 页4 商城 ===================== -->
+    <div class="page" id="pg-mall">
+      <div class="vip">
+        <div class="b">城忆会员 · ¥18/季</div>
+        <div class="s">订制款免加印费 ｜ 科普课程全年畅学 ｜ 每月 2 次抽奖</div>
+      </div>
+      <h2 class="sec">积分兑换</h2>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px">当前印章积分：<b style="color:var(--red);font-size:17px" id="ptShow">127</b></div>
+        <button class="btn sm" onclick="toast('兑换成功（演示）：精美书签已加入订单')">兑换书签（60分）</button>
+      </div>
+      <h2 class="sec">文创商城</h2>
+      <div class="goods">
+        <div class="g"><div class="ph" style="background:#f5ede0">📮</div><div class="nm">明信片·泉城八景（基础款）</div><div class="pr">¥15 <small>印有本平台品牌形象</small></div></div>
+        <div class="g"><div class="ph" style="background:#e9eef5">🧊</div><div class="nm">冰箱贴·超然楼（基础款）</div><div class="pr">¥29 <small>官方点位插画</small></div></div>
+        <div class="g"><div class="ph" style="background:#fbeae7">👜</div><div class="nm">帆布包扎染（非遗形式）</div><div class="pr">¥49 <small>非遗工坊合作</small></div></div>
+        <div class="g"><div class="ph" style="background:#e8f0ea">🧧</div><div class="nm">香囊·平安（非遗形式）</div><div class="pr">¥25 <small>内装艾草</small></div></div>
+        <div class="g" style="border-color:var(--red)"><span class="badge-top" style="background:var(--red);color:#fff">热</span><div class="ph" style="background:#fdf1ef">🖨️</div><div class="nm">AI旅拍·实体照片即时打印</div><div class="pr">¥19.9 <small>合成后现场出片 · 多种支付</small></div></div>
+        <div class="g"><div class="ph" style="background:#e9eef5">🖼️</div><div class="nm">旅拍装裱画·剪纸边框</div><div class="pr">¥59 <small>你的装扮形象 × 非遗剪纸装裱</small></div></div>
+        <div class="g" style="border-color:var(--gold)"><span class="badge-top">订制</span><div class="ph" style="background:#fdf6e3">🎨</div><div class="nm">订制款·印你的专属 IP</div><div class="pr">¥39 <small>会员免费 · 普通用户 +¥10</small></div></div>
+        <div class="g" style="border-color:var(--gold)"><span class="badge-top">订制</span><div class="ph" style="background:#fdf6e3">🧣</div><div class="nm">订制款·围巾/桌垫</div><div class="pr">¥79 <small>任选已生成 IP 图案</small></div></div>
+      </div>
+      <div class="muted mt12" style="text-align:center">文创形式均选用地方特色载体：帆布包扎染、香囊、剪纸装裱画、木版年画等</div>
+    </div>
+
+    <!-- ===================== 页5 我的 ===================== -->
+    <div class="page" id="pg-me">
+      <div class="card" style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">济</div>
+        <div><b style="font-size:14px">泉客·阿济</b><div class="muted">打卡 127 处 ｜ 投稿 8 条 ｜ IP 作品 <span id="ipN2">0</span> 个 ｜ 旅拍 <span id="shotN2">0</span> 张</div></div>
+      </div>
+      <h2 class="sec">时空来信 · 离馆后的长效运营</h2>
+      <div class="card">
+        <div class="lesson"><div class="cover">💌</div><div><div class="t">你的分身在趵突泉看了一场日出</div><div class="d">「主人，今天三股水特别旺，我替你在泺源堂前拍了一张合影。」</div></div></div>
+        <div class="lesson"><div class="cover">🎭</div><div><div class="t">时空舞台 · 馆内大屏合影</div><div class="d">馆内互动大屏投放分身实时行走，扫码即可与自己的分身同框打卡</div></div></div>
+        <div class="lesson"><div class="cover">💬</div><div><div class="t">与分身文字 / 语音对话</div><div class="d">问它"曲水亭街的柳树几岁了"，它会用你上传的故事回答你</div></div></div>
+        <div class="muted mt8">机制参考文博场景「AI 旅拍 + 长效链接」：把单次打卡的线下流量，转化为长期活跃的线上数据资产——分身动态依托微信生态不定期推送。</div>
+        <button class="btn gold sm mt8" style="width:100%" onclick="toast('已开启推送（演示）：下次分身出游会第一时间告诉你')">🔔 开启分身动态推送</button>
+      </div>
+      <h2 class="sec">文化遗产科普课程 <span class="chip">会员专享</span></h2>
+      <div class="card">
+        <div class="lesson"><div class="cover">🏛️</div><div><div class="t">第一课 · 中国古建筑屋顶形制</div><div class="d">庑殿/歇山/悬山/硬山 · 从趵突泉泺源堂讲起 · 12 分钟</div></div></div>
+        <div class="lesson"><div class="cover">🏺</div><div><div class="t">第二课 · 考古地层学入门</div><div class="d">为什么"挖层"比"挖宝"重要 · 10 分钟</div></div></div>
+        <div class="lesson"><div class="cover">🌊</div><div><div class="t">第三课 · 泉水与济南城</div><div class="d">岩溶地貌 · 七十二名泉的成因 · 15 分钟</div></div></div>
+        <div class="lesson"><div class="cover">🌉</div><div><div class="t">第四课 · 中外遗产保护史</div><div class="d">从《威尼斯宪章》到活态传承 · 14 分钟</div></div></div>
+        <button class="btn gold sm" style="width:100%" onclick="toast('试看 3 分钟（演示）· 开通会员可看全集')">▶ 试看第一课</button>
+      </div>
+      <h2 class="sec">审核后台（管理员）</h2>
+      <div class="card">
+        <div class="adm"><b style="font-size:12px">投稿：市民张先生 · 「估衣市街的老门楼」照片</b><span class="st w">待审核</span>
+          <div class="muted">真实性核校 → 补充来源 → 采纳后积分 +20</div>
+          <div class="mt8"><button class="btn sm" onclick="toast('已通过并点亮（演示）')">通过</button> <button class="btn ghost sm" onclick="toast('已退回补充来源（演示）')">退回</button></div>
+        </div>
+        <div class="adm"><b style="font-size:12px">投稿：学生投稿 · 「黑虎泉兽头传说」口述文字</b><span class="st w">待审核</span>
+          <div class="mt8"><button class="btn sm" onclick="toast('已通过（演示）')">通过</button> <button class="btn ghost sm" onclick="toast('已退回（演示）')">退回</button></div>
+        </div>
+        <div class="adm"><b style="font-size:12px">讨论帖：「曲水亭街的柳树是哪年种的」</b><span class="st ok">已公开</span>
+          <div class="muted">标签：个人故事和记忆 · 浏览 312 · 回复 7</div>
+        </div>
+        <div class="adm"><b style="font-size:12px">资讯：讲座「明府城考古分享会」</b><span class="st ok">已发布</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- bottom nav -->
+  <div class="nav">
+    <button class="on" onclick="go('pg-map',this)"><span class="ic">🗺️</span>地图</button>
+    <button onclick="go('pg-info',this)"><span class="ic">📰</span>资讯</button>
+    <button onclick="go('pg-ip',this)"><span class="ic">🎨</span>IP工坊</button>
+    <button onclick="go('pg-mall',this)"><span class="ic">🛍️</span>商城</button>
+    <button onclick="go('pg-me',this)"><span class="ic">👤</span>我的</button>
+  </div>
+
+  <!-- 点位详情弹层 -->
+  <div class="dlg-mask" id="mask" onclick="closeDlg()"></div>
+  <div class="dlg" id="dlg">
+    <div class="handle"></div>
+    <button class="close" onclick="closeDlg()">✕</button>
+    <h3 id="dTitle">趵突泉</h3>
+    <div id="dMeta" class="muted"></div>
+    <div class="checkin" id="ckBox">
+      <div><b style="font-size:12.5px">📍 定位打卡</b><div class="muted" id="ckN">已有 4,286 人在此打卡</div></div>
+      <button class="btn sm" id="ckBtn" onclick="doCheck()">打卡+1</button>
+    </div>
+    <div style="font-size:12.5px;margin:8px 0 2px"><b>讨论区</b>（公开可见）· 选择类别发言：</div>
+    <div class="tags">
+      <button data-t="0" class="on">💭 个人故事和记忆</button>
+      <button data-t="1">🧭 参观攻略</button>
+      <button data-t="2">📚 学术/档案资料</button>
+    </div>
+    <div id="posts"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input id="msgIn" placeholder="说点什么…" style="flex:1;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:12px;outline:none">
+      <button class="btn sm" onclick="sendMsg()">发布</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;left:50%;top:12%;transform:translateX(-50%);background:#2b2118;color:#fff;
+  padding:9px 18px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:99;pointer-events:none"></div>
+
+<script>
+/* ---------- 数据 ---------- */
+const PTS=[
+ {n:"趵突泉",c:1,era:"古代（金代立碑，天下第一泉）",ck:4286,
+  posts:[["老济南人","💭","小时候我爸带我来，说水旺的时候能看见三股水齐冒。那会儿不收票，就在栏杆边上看一下午。","个人故事和记忆"],
+         ["文保志愿者","📚","《历城县志》卷十六载：'泉源上奋，水涌若轮。'金代《名泉碑》列为七十二泉之首。","学术/档案资料"],
+         ["旅行日记","🧭","早7点前人少，出东门右转就是五龙潭，一条线逛完正好中午。","参观攻略"]]},
+ {n:"大明湖·超然楼",c:2,era:"近代重建（2008年复建，元代旧址）",ck:9120,
+  posts:[["亮灯摄影","💭","等亮灯的那一分钟，全楼的人都在喊倒计时，挺感人的。","个人故事和记忆"],
+         ["建院学生","📚","楼体按元代张养浩《超然楼》诗意复建，铜贴金'江北第一楼'匾。","学术/档案资料"]]},
+ {n:"黑虎泉",c:1,era:"古代（明代《历乘》有载）",ck:6703,
+  posts:[["打水大爷","💭","天天来打水，这泉水泡茶就是甜。虎头那边排队别挤，后面还有仨。","个人故事和记忆"]]},
+ {n:"曲水亭街",c:2,era:"近代街区（明清格局延续）",ck:5311,
+  posts:[["街角咖啡","💭","家家泉水、户户垂杨，说的就是这儿。我店就开在王府池子边上。","个人故事和记忆"],
+         ["攻略组","🧭","连着百花洲、后宰门街一起逛，傍晚最好，灯笼亮了有老城味道。","参观攻略"]]},
+ {n:"老济南站钟楼",c:2,era:"近代（1911年津浦铁路，1992年拆除，现存记忆地标）",ck:2104,
+  posts:[["城市记忆","💭","老站没了，可钟楼照片还在每家相册里。上传点位就是想让它别被忘掉。","个人故事和记忆"],
+         ["史地爱好者","📚","德式建筑，赫尔曼·菲舍尔设计。拆除争议本身是城市保护史的重要案例。","学术/档案资料"]]},
+ {n:"市博物馆（原道院）",c:3,era:"近代建筑（1942年建成）",ck:1855,
+  posts:[["讲解员小刘","🧭","周二至周日9:00-17:00，免费，带身份证。一层济南历史展值得细看。","参观攻略"]]},
+ {n:"洪家楼教堂",c:2,era:"近代（1901年，华北最大天主堂）",ck:3902,
+  posts:[["建院学生","📚","哥特式，洪楼deals双塔高约60米，用料为洪家楼当地石料。","学术/档案资料"]]},
+];
+/* 全国视图：34 省级区域 · 首都/省会/著名大城市 · 基础地标 */
+const NAT=[
+ ["北京","北京","故宫（紫禁城）","古代",63,29],
+ ["天津","天津","五大道近代建筑群","近代",65,31],
+ ["石家庄","河北","正定古城","古代",61,33],
+ ["太原","山西","晋祠","古代",57,34],
+ ["呼和浩特","内蒙古","大召寺","古代",53,26],
+ ["沈阳","辽宁","沈阳故宫","古代",70,24],
+ ["长春","吉林","伪满皇宫博物院","近代",72,18],
+ ["哈尔滨","黑龙江","中央大街","近代",74,12],
+ ["上海","上海","外滩历史建筑群","近代",72,51],
+ ["南京","江苏","夫子庙-秦淮河","古代",68,46],
+ ["杭州","浙江","西湖十景","古代",70,55],
+ ["合肥","安徽","三河古镇","古代",65,46],
+ ["福州","福建","三坊七巷","古代",71,60],
+ ["南昌","江西","滕王阁","古代",63,50],
+ ["济南","山东","趵突泉 · 试点详图","古代",66,37],
+ ["郑州","河南","少林寺常住院","古代",58,42],
+ ["武汉","湖北","黄鹤楼","古代",61,48],
+ ["长沙","湖南","岳麓书院","古代",60,53],
+ ["广州","广东","陈家祠","古代",65,66],
+ ["香港","中国香港","香港故宫文化博物馆","近代",63,68],
+ ["澳门","中国澳门","大三巴牌坊","近代",61,68],
+ ["南宁","广西","三街两巷","近代",55,64],
+ ["海口","海南","骑楼老街","近代",57,76],
+ ["重庆","重庆","洪崖洞","近代",52,48],
+ ["成都","四川","宽窄巷子","近代",46,47],
+ ["贵阳","贵州","青岩古镇","古代",53,55],
+ ["昆明","云南","云南陆军讲武堂","近代",46,57],
+ ["拉萨","西藏","布达拉宫","古代",28,52],
+ ["西安","陕西","秦始皇帝陵博物院","古代",53,40],
+ ["兰州","甘肃","黄河铁桥","近代",43,40],
+ ["西宁","青海","塔尔寺","古代",38,40],
+ ["银川","宁夏","西夏陵","古代",47,33],
+ ["乌鲁木齐","新疆","新疆国际大巴扎","近代",23,26],
+ ["台北","中国台湾","艋舺龙山寺","古代",76,61],
+];
+let jnIdx=0;
+NAT.forEach((a,i)=>{
+  PTS.push({n:a[0]+" · "+a[2],c:a[3]==="古代"?1:2,
+    era:a[3]+" · 基础地标（内容由用户自行上传）",
+    ck:120+((i*977)%2800),basic:a,posts:[]});
+  if(a[0]==="济南")jnIdx=7+i;
+});
+document.getElementById('natMap').insertAdjacentHTML('beforeend',
+ NAT.map((a,i)=>`<div class="pin npin" style="left:${a[4]}%;top:${a[5]}%" data-p="${7+i}">
+   <div class="dot"></div><div class="lb">${a[0]}</div></div>`).join(''));
+const CAT={1:["① 古迹与考古遗址","c1"],2:["② 历史建筑与街区","c2"],3:["③ 博物馆","c3"]};
+let cur=null, tagIdx=0, userPts=127;
+
+/* ---------- 导航 ---------- */
+function go(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on'); else document.querySelector('.nav button').classList.add('on');
+  document.querySelector('.bd').scrollTop=0;
+}
+
+/* ---------- 地图选点 ---------- */
+document.querySelectorAll('.pin').forEach(p=>p.addEventListener('click',e=>{
+  e.stopPropagation();
+  document.querySelectorAll('.pin').forEach(x=>x.classList.remove('sel'));
+  p.classList.add('sel');
+  openDlg(+p.dataset.p);
+}));
+function openDlg(i){
+  cur=i; const d=PTS[i];
+  document.getElementById('dTitle').textContent=d.n;
+  const [cn,cc]=CAT[d.c];
+  let metaHTML=`<span class="chip ${cc}">${cn}</span> ${d.era}`;
+  if(i===jnIdx) metaHTML+=` <button class="btn sm gold" onclick="setView('jn');closeDlg();openDlg(0)">💧 进入济南试点详图</button>`;
+  if(d.basic) metaHTML+=`<div class="muted mt8">该城市为<b>基础地标</b>点位：讨论内容、老照片、口述故事均由用户自行上传，经审核后公开。</div>`;
+  document.getElementById('dMeta').innerHTML=metaHTML;
+  document.getElementById('ckN').textContent=`已有 ${d.ck.toLocaleString()} 人在此打卡`;
+  document.getElementById('ckBtn').disabled=false; document.getElementById('ckBtn').textContent='打卡+1';
+  renderPosts(); tagIdx=0; setTagBtns();
+  document.getElementById('mask').style.display='block';
+  document.getElementById('dlg').style.display='block';
+}
+function closeDlg(){document.getElementById('mask').style.display='none';document.getElementById('dlg').style.display='none'}
+function renderPosts(){
+  const d=PTS[cur];
+  if(!d.posts.length){
+    document.getElementById('posts').innerHTML=
+      '<div class="muted" style="padding:14px 0;text-align:center;border-top:1px dashed var(--line)">该点位还没有讨论内容——<br><b style="color:var(--red)">成为第一个上传故事 / 攻略 / 资料的人！</b></div>';
+    return;
+  }
+  document.getElementById('posts').innerHTML=d.posts.map(p=>
+    `<div class="post"><span class="pt">标签：${p[3]}</span><span class="who">${p[0]}</span><br>${p[2]}</div>`).join('');
+}
+function setView(v){
+  document.getElementById('natWrap').style.display=v==='nat'?'block':'none';
+  document.getElementById('jnWrap').style.display=v==='jn'?'block':'none';
+  document.getElementById('vNat').className=v==='nat'?'btn sm':'btn ghost sm';
+  document.getElementById('vJn').className=v==='jn'?'btn sm':'btn ghost sm';
+  document.querySelector('.bd').scrollTop=0;
+}
+document.querySelectorAll('.tags button').forEach(b=>b.addEventListener('click',()=>{
+  tagIdx=+b.dataset.t; setTagBtns();
+}));
+function setTagBtns(){document.querySelectorAll('.tags button').forEach(b=>b.classList.toggle('on',+b.dataset.t===tagIdx))}
+function sendMsg(){
+  const v=document.getElementById('msgIn').value.trim(); if(!v)return;
+  PTS[cur].posts.unshift(["我","💭",v,["个人故事和记忆","参观攻略","学术/档案资料"][tagIdx]]);
+  document.getElementById('msgIn').value=''; renderPosts();
+  toast('已发布到公开讨论区（演示）');
+}
+function doCheck(){
+  const d=PTS[cur]; d.ck++; userPts+=1;
+  document.getElementById('ckN').textContent=`已有 ${d.ck.toLocaleString()} 人在此打卡`;
+  const b=document.getElementById('ckBtn'); b.disabled=true; b.textContent='✓ 已打卡';
+  document.getElementById('ptShow').textContent=userPts;
+  toast('打卡成功 · 印章积分 +1（定位签到）');
+}
+
+/* ---------- IP 工坊 ---------- */
+const FL={gq:'saturate(1.7) contrast(1.15) hue-rotate(-8deg)',sm:'grayscale(1) contrast(1.35) brightness(1.05)',
+  jf:'saturate(2.2) contrast(1.9) brightness(1.1)',xs:'saturate(1.4) contrast(1.5)'};
+const FN={gq:'国潮插画',sm:'水墨',jf:'剪纸',xs:'像素'};
+let curFile=null, curStyle='gq', ipCount=0;
+const fi=document.getElementById('f');
+fi.addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file)return;
+  curFile=URL.createObjectURL(file);
+  document.getElementById('srcImg').src=curFile;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setStep(2);
+});
+document.querySelectorAll('.styles button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.styles button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curStyle=b.dataset.f;
+}));
+function genIP(){
+  setStep(3);
+  const c=document.getElementById('ipCanvas'),ctx=c.getContext('2d');
+  c.style.display='block';
+  const img=new Image(); img.onload=()=>{
+    ctx.fillStyle='#faf6ef'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.save(); ctx.filter=FL[curStyle];
+    const r=36, w=240,h=180, x=(c.width-w)/2,y=26;
+    ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.clip();
+    const s=Math.max(w/img.width,h/img.height);
+    ctx.drawImage(img,x+(w-img.width*s)/2,y+(h-img.height*s)/2,img.width*s,img.height*s);
+    ctx.restore();
+    ctx.filter='none';
+    ctx.strokeStyle='#b03a2e'; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke();
+    // 印章
+    ctx.fillStyle='#b03a2e'; ctx.beginPath(); ctx.roundRect(c.width-78,c.height-70,52,42,6); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.font='bold 15px serif'; ctx.textAlign='center';
+    ctx.fillText('城忆',c.width-52,c.height-50); ctx.fillText('监制',c.width-52,c.height-33);
+    ctx.fillStyle='#2b2118'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(`${cur!=null?PTS[cur].n:'自定义点位'} · ${FN[curStyle]}风`, 16, c.height-24);
+  };
+  img.src=curFile;
+}
+function saveIP(){
+  ipCount++; document.getElementById('ipN').textContent=ipCount; document.getElementById('ipN2').textContent=ipCount;
+  const url=document.getElementById('ipCanvas').toDataURL();
+  const list=document.getElementById('ipList');
+  if(ipCount===1)list.innerHTML='';
+  list.insertAdjacentHTML('afterbegin',
+    `<div class="g" style="padding:6px"><img src="${url}" style="width:100%;border-radius:8px">
+     <div class="nm mt8" style="font-size:11px">IP作品 #${ipCount}</div>
+     <button class="btn sm gold mt8" style="width:100%" onclick="toast('已跳转订制款下单（演示）：会员免费印制')">去订制文创</button></div>`);
+  toast('已存入我的 IP 库，可在商城订制款使用');
+  resetIP();
+}
+function resetIP(){
+  curFile=null; document.getElementById('f').value='';
+  document.getElementById('ipCanvas').style.display='none';
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='block'; setStep(1);
+}
+function setStep(n){[1,2,3].forEach(i=>document.getElementById('st'+i).classList.toggle('on',i===n))}
+
+/* ---------- 模式切换：IP 创作 / AI 旅拍 ---------- */
+function setMode(m){
+  document.getElementById('ipFlow').style.display=m==='ip'?'block':'none';
+  document.getElementById('shotFlow').style.display=m==='shot'?'block':'none';
+  document.getElementById('mIp').className=m==='ip'?'btn sm':'btn ghost sm';
+  document.getElementById('mShot').className=m==='shot'?'btn sm':'btn ghost sm';
+}
+
+/* ---------- AI 旅拍 · 城市装扮 ---------- */
+const SHOTS=[
+ {n:"泉城名士 · 宋风",bg:"趵突泉 · 泺源堂",sky:["#f7e8c8","#e6cd9c"],robe:"#3d6b6b",acc:"#2b4a4a",hat:"🎩"},
+ {n:"民国学生 · 老商埠",bg:"老济南站 · 钟楼",sky:["#e8eef5","#cfdde8"],robe:"#6b7d96",acc:"#31567d",hat:"🎓"},
+ {n:"荷风仙子 · 大明湖",bg:"大明湖 · 超然楼",sky:["#fdeef2","#f6d7e2"],robe:"#c96a7e",acc:"#a13d5a",hat:"🌸"},
+];
+let shotStyle=0, shotFile=null, shotCount=0;
+document.getElementById('shotStyles').innerHTML=SHOTS.map((s,i)=>
+  `<button data-i="${i}" class="${i===0?'on':''}">${s.hat} ${s.n}</button>`).join('');
+document.getElementById('shotStyles').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#shotStyles button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); shotStyle=+b.dataset.i;
+  document.getElementById('shotStyleName').textContent=SHOTS[shotStyle].n;
+  document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
+  setStepT(2);
+});
+document.getElementById('sf').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  shotFile=URL.createObjectURL(f);
+  document.getElementById('faceDrop').innerHTML=
+    '<img id="facePrev" style="max-height:86px;border-radius:10px;border:1px solid var(--line)">面部采集完成 ✅';
+  document.getElementById('facePrev').src=shotFile;
+  document.getElementById('genBtn').disabled=false;
+});
+function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
+function genShot(){
+  setStepT(3);
+  const c=document.getElementById('shotCanvas'),ctx=c.getContext('2d');
+  const s=SHOTS[shotStyle];
+  c.style.display='block';
+  const img=new Image();
+  img.onload=()=>{
+    /* 天空 */
+    const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,s.sky[0]);g.addColorStop(1,s.sky[1]);
+    ctx.fillStyle=g;ctx.fillRect(0,0,340,420);
+    /* 城市底图：主题建筑剪影（随城市/展览快速复用） */
+    ctx.fillStyle='rgba(43,33,24,.28)';
+    ctx.fillRect(30,70,120,60); ctx.fillRect(215,90,95,45);
+    ctx.beginPath();ctx.moveTo(24,70);ctx.lineTo(90,36);ctx.lineTo(156,70);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(208,90);ctx.lineTo(262,60);ctx.lineTo(318,90);ctx.closePath();ctx.fill();
+    ctx.fillRect(255,30,16,60); /* 钟楼塔尖 */
+    /* 水面与地面 */
+    ctx.fillStyle='rgba(120,160,180,.4)';ctx.fillRect(0,300,340,28);
+    ctx.fillStyle='rgba(43,33,24,.16)';ctx.fillRect(0,328,340,92);
+    /* 服饰（按风格复用的装扮模型） */
+    ctx.fillStyle=s.robe;
+    ctx.beginPath();ctx.moveTo(170,196);
+    ctx.bezierCurveTo(118,214,100,330,92,368);ctx.lineTo(248,368);
+    ctx.bezierCurveTo(240,330,222,214,170,196);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=s.acc;ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle=s.acc;
+    ctx.beginPath();ctx.moveTo(170,206);ctx.lineTo(142,244);ctx.lineTo(170,282);ctx.lineTo(198,244);ctx.closePath();ctx.fill();
+    /* 面部合成（演示：原图贴合；正式版为人脸融合模型） */
+    ctx.save();ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.clip();
+    const sc=Math.max(116/img.width,116/img.height)*1.35;
+    ctx.drawImage(img,170-img.width*sc/2,148-img.height*sc/2,img.width*sc,img.height*sc);
+    ctx.restore();
+    ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.stroke();
+    ctx.font='26px serif';ctx.textAlign='center';ctx.fillText(s.hat,210,108);
+    /* 说明栏 */
+    ctx.fillStyle='#fff';ctx.fillRect(0,368,340,52);
+    ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
+    ctx.fillText(`${s.n} · ${s.bg}`,170,390);
+    ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
+    ctx.fillText('城忆 AI 旅拍 · 城市主题底图复用 · 仅本地演示',170,408);
+  };
+  img.src=shotFile;
+}
+function saveShot(){
+  shotCount++; ipCount++;
+  document.getElementById('ipN').textContent=ipCount;
+  document.getElementById('ipN2').textContent=ipCount;
+  document.getElementById('shotN2').textContent=shotCount;
+  const url=document.getElementById('shotCanvas').toDataURL();
+  const list=document.getElementById('ipList');
+  if(ipCount===1)list.innerHTML='';
+  list.insertAdjacentHTML('afterbegin',
+    `<div class="g" style="padding:6px"><img src="${url}" style="width:100%;border-radius:8px">
+     <div class="nm mt8" style="font-size:11px">旅拍形象 #${shotCount}</div>
+     <button class="btn sm mt8" style="width:100%" onclick="toast('打印订单已创建（演示）：现场取片 ¥19.9')">🖨️ 打印出片</button></div>`);
+  toast('已存入旅拍册，可打印实体照片或订制文创');
+  resetShot();
+}
+function resetShot(){
+  shotFile=null; document.getElementById('sf').value='';
+  document.getElementById('shotCanvas').style.display='none';
+  document.getElementById('shot3').style.display='none';
+  document.getElementById('shot2').style.display='none';
+  document.getElementById('shot1').style.display='block'; setStepT(1);
+  document.getElementById('genBtn').disabled=true;
+}
+
+/* ---------- toast ---------- */
+let tt=null;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.opacity=1;
+  clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,2200)}
+</script>
+</body>
+</html>
