@@ -101,96 +101,124 @@
   .g .nm{font-weight:700;font-size:12px}
   .g .pr{color:var(--red);font-weight:700;margin-top:3px}
   .g .pr small{color:var(--muted);font-weight:400}
-  /* ip studio */
-  .steps{display:flex;gap:6px;margin-bottom:12px}
-  .steps div{flex:1;text-align:center;font-size:10.5px;color:var(--muted);padding:6px 2px;border-radius:8px;background:#f2ede2}
-  .steps div.on{background:var(--red);color:#fff;font-weight:700}
-  .drop{border:2px dashed #cbb;border-radius:14px;background:#fffdf8;height:120px;display:flex;
-    flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:12px;cursor:pointer}
-  .styles{display:flex;gap:8px;margin:12px 0}
-  .styles button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 2px 9px;
-    font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.35}
-  .styles button .sw{font-size:17px;line-height:1.2}
-  .styles button small{font-size:9px;color:var(--muted);font-weight:400}
-  .styles button.on{border-color:var(--gold);background:#fdf6e3;color:#7a5c14;font-weight:700}
-  .styles button.on small{color:#a98a3c}
-  #idea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;
-    resize:none;height:54px;background:#fffdf8;color:var(--ink);font-family:inherit}
-  #idea:focus{outline:none;border-color:var(--gold)}
-  #ipBusy{height:4px;border-radius:2px;background:#efe9dc;overflow:hidden;display:none;margin:10px 0 6px}
-  #ipProg{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .45s}
-  #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
-  @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
-  /* ===== 造物局 Pro 双栏工作台（IP 创作 + AI 旅拍共用） ===== */
-  #ipBusy{height:4px;border-radius:2px;background:#e2d8c6;overflow:hidden;display:none;margin:0 0 10px}
-  #ipProg{height:100%;width:0;background:linear-gradient(90deg,#a83e32,#c69a4c);transition:width .45s}
-  #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
-  @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
-  /* 结果画板：干净全幅作品大图（与参考版式一致），canvas 仅作离屏渲染面 */
-  #ipCanvas,#shotCanvas{display:none}
-  .board img.fullart{display:none;max-width:94%;max-height:94%;object-fit:contain;border-radius:8px;box-shadow:0 10px 30px rgba(67,48,30,.22);z-index:0;position:relative}
-  .board.ready img.fullart{display:block}
-  .board .wm-line{position:absolute;bottom:13px;left:0;right:0;text-align:center;color:#8e826e;font-size:8px;letter-spacing:2px;z-index:2;display:none;pointer-events:none}
-  .board.ready .wm-line{display:block;color:#fff;text-shadow:0 1px 4px #0006}
-  .board .wm-seal{position:absolute;right:20px;bottom:18px;width:44px;height:44px;border:1px solid #fff9;border-radius:8px;color:#fff;text-shadow:0 1px 5px #0008;font-family:serif;font-size:12px;line-height:1.25;text-align:center;padding-top:8px;z-index:2;display:none;pointer-events:none;background:rgba(0,0,0,.1)}
-  .board.ready .wm-seal{display:block}
-  .ws{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(270px,.96fr);gap:14px;align-items:stretch}
-  @media(max-width:760px){.ws{grid-template-columns:1fr}}
-  .pn{background:#fffdf9;border:1px solid #e9dfd0;border-radius:18px;box-shadow:0 12px 34px rgba(67,48,30,.08);padding:16px}
-  .pn-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .pn-head b{font-size:13.5px;letter-spacing:.3px}
-  .st-label{font-size:9px;color:var(--muted);letter-spacing:1.3px}
-  .chip{font-size:10px;padding:3px 10px;border-radius:20px;background:#f2ede2;color:var(--muted)}
-  .chip.busy{background:#fdf6e3;color:#a98a3c}
-  .chip.ok{background:#e8f0ea;color:#2f5d3a}
-  .chip.live{color:#2f5d3a}
-  .chip.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#76a37f;margin-right:6px}
-  .up2{min-height:150px;border:1.5px dashed #d9caba;border-radius:15px;background:linear-gradient(145deg,#fffdf9,#f8f2e7);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s}
-  .up2:hover,.up2.drag{border-color:var(--red);background:#fbf4ed}
-  .up2 .upic{width:42px;height:42px;border-radius:13px;background:#f2e7d5;color:var(--red);display:grid;place-items:center;margin:0 auto 8px;font-size:20px}
-  .up2 b{display:block;font-size:12.5px}
-  .up2 .sub{display:block;margin-top:5px;color:var(--muted);font-size:10.5px}
-  .up2 img.upimg{display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-  .up2.has-img img.upimg{display:block}
-  .up2.has-img .upcontent{display:none}
-  .upcontent{padding:14px}
-  .helper2{font-size:10px;color:var(--muted);line-height:1.7;margin:8px 2px 14px}
-  .sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .sgrid.c3{grid-template-columns:repeat(3,1fr)}
-  .scard{min-width:0;border:1px solid #e9dfd0;background:#fffdfa;border-radius:13px;padding:8px 4px 9px;color:var(--ink);transition:.18s;cursor:pointer}
-  .scard:hover{transform:translateY(-2px);border-color:#d6b78a}
-  .scard.on{border:1.5px solid var(--gold);background:#fcf5e8;box-shadow:0 0 0 3px #c69a4c1a}
-  .scard .art{height:50px;border-radius:9px;display:grid;place-items:center;font-size:24px;margin-bottom:7px;background:linear-gradient(135deg,#eedcc2,#f8eee0)}
-  .scard:nth-child(2) .art{background:linear-gradient(135deg,#dce1dc,#f3f1e8)}
-  .scard:nth-child(3) .art{background:linear-gradient(135deg,#e9c2ad,#f7e3ce)}
-  .scard:nth-child(4) .art{background:linear-gradient(135deg,#dce6da,#e9e9d8)}
-  .scard b{display:block;font-size:10.5px}
-  .scard small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
-  .idea2{width:100%;resize:vertical;min-height:56px;border:1px solid #e9dfd0;border-radius:11px;padding:10px 11px;font-size:12px;line-height:1.6;color:var(--ink);outline:none;background:#fffdfa;font-family:inherit}
-  .idea2:focus{border-color:#caa565;box-shadow:0 0 0 3px #c69a4c1a}
-  .pbtn{border:0;background:linear-gradient(135deg,#a83e32,#873128);color:#fff;border-radius:11px;padding:11px 14px;font-size:12px;font-weight:700;box-shadow:0 6px 14px #a83e3224;cursor:pointer}
-  .pbtn:disabled{opacity:.48;cursor:not-allowed}
-  .pbtn2{border:1px solid #e9dfd0;background:#fffdf9;color:var(--ink);border-radius:11px;padding:11px 14px;font-size:12px;cursor:pointer}
-  .pbtn2:hover{border-color:#cfad77}
-  .board{position:relative;min-height:300px;border-radius:15px;overflow:hidden;background:radial-gradient(ellipse at 48% 42%,#faf6ef 0,#e6d9c4 76%)}
-  .board:before,.board:after{content:"";position:absolute;inset:12px;border:1px solid #b89a6b55;border-radius:10px;pointer-events:none;z-index:1}
-  .board:after{inset:17px;border-style:dashed;opacity:.5}
-  .board.ready:before{border-color:#fff9}
-  .board.ready:after{display:none}
-  .board .bempty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;color:#8f806b;z-index:2}
-  .board .bempty .bic{font-size:42px;opacity:.65}
-  .board .bempty b{display:block;font-family:"Songti SC",STSong,serif;font-size:15px;font-weight:500;margin:10px 0 5px}
-  .board .bempty span{font-size:10px}
-  .board.ready .bempty{display:none}
-  .board canvas{position:relative;z-index:0;display:none}
-  .board.ready canvas{display:block}
-  .hero2{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:6px 0 14px}
-  .eyebrow2{display:flex;align-items:center;gap:8px;color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px}
-  .eyebrow2:before{content:"";width:22px;height:1px;background:var(--red)}
-  .hero2 h1{font-family:"Songti SC",STSong,serif;font-weight:500;font-size:clamp(20px,4.5vw,30px);letter-spacing:1px;margin:8px 0 6px}
-  .hero2 p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.8}
-  .hero-note{max-width:230px;text-align:right;color:var(--muted);font-size:10px;line-height:1.8}
-  .hero-note strong{font:20px "Songti SC",STSong,serif;color:var(--red);display:block}
+
+  /* ===== IP 工坊 · 城忆造物局 Pro（1:1 完整替换） ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pg-ip .hero{padding:48px 0 34px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+#pg-ip .kicker{color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+#pg-ip .kicker:before{content:"";width:22px;height:1px;background:var(--red)}
+#pg-ip h1{font:500 clamp(32px,5vw,54px)/1.2 "Songti SC",STSong,serif;letter-spacing:1px;margin:14px 0 10px}
+#pg-ip .hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.9}
+#pg-ip .hero-meta{text-align:right;font-size:10px;line-height:1.9;color:var(--muted);padding-bottom:4px}
+#pg-ip .hero-meta strong{font:22px "Songti SC",serif;color:var(--red);display:block}
+#pg-ip .workspace{display:grid;grid-template-columns:minmax(370px,.84fr) minmax(0,1.16fr);gap:18px}
+#pg-ip .panel{background:var(--white);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+#pg-ip .controls{padding:24px}
+#pg-ip .row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+#pg-ip .row-head h2{margin:0;font-size:13px;font-weight:700}
+#pg-ip .count{font-size:9px;letter-spacing:1px;color:#9a9387}
+#pg-ip .upload{height:128px;border:1px dashed #d2c9b9;border-radius:13px;background:linear-gradient(135deg,#fcfaf5,#f4efe5);position:relative;display:grid;place-items:center;text-align:center;overflow:hidden}
+#pg-ip .upload.drag{border-color:var(--red);background:#f9eee8}
+#pg-ip .upload input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;z-index:2}
+#pg-ip .upload-img{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#pg-ip .upload.has-image .upload-img{display:block}
+#pg-ip .upload.has-image .upload-copy{display:none}
+#pg-ip .upload-copy{pointer-events:none}
+#pg-ip .up-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:#efe5d6;color:var(--red);font-size:19px;margin:0 auto 7px}
+#pg-ip .upload-copy b{font-size:11px}
+#pg-ip .upload-copy span{display:block;color:var(--muted);font-size:9px;margin-top:5px}
+#pg-ip .privacy{font-size:9px;color:#8c8579;margin:8px 0 21px;line-height:1.6}
+#pg-ip .styles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+#pg-ip .style{padding:0 0 8px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);overflow:hidden;transition:.18s}
+#pg-ip .style:hover{transform:translateY(-2px);border-color:#c5ab7d}
+#pg-ip .style.selected{border-color:var(--gold);box-shadow:0 0 0 2px #bd99551c}
+#pg-ip .swatch{height:56px;display:grid;place-items:center;font-size:23px;margin-bottom:7px}
+#pg-ip .style b{display:block;font-size:9px}
+#pg-ip .style small{display:block;font-size:8px;color:var(--muted);margin-top:3px}
+#pg-ip .style[data-style="gq"] .swatch{background:linear-gradient(135deg,#ecd8b4,#f6ebd6)}
+#pg-ip .style[data-style="sm"] .swatch{background:linear-gradient(135deg,#d9ddd7,#f0eee7)}
+#pg-ip .style[data-style="jf"] .swatch{background:linear-gradient(135deg,#e9c2ad,#f7e7d8)}
+#pg-ip .style[data-style="xs"] .swatch{background:linear-gradient(135deg,#dbe4d7,#f1e8cc)}
+#pg-ip .prompt-title{margin:20px 0 8px;font-size:11px;font-weight:700}
+#pg-ip .prompt{resize:vertical;width:100%;min-height:62px;padding:10px 11px;background:#fff;border:1px solid var(--line);border-radius:10px;outline:none;font-size:11px;line-height:1.6}
+#pg-ip .prompt:focus{border-color:var(--gold);box-shadow:0 0 0 3px #bd99551a}
+#pg-ip .prompt::placeholder{color:#aaa397}
+#pg-ip .button-row{display:flex;gap:8px;margin-top:13px}
+#pg-ip .btn{border-radius:10px;padding:11px 13px;font-size:11px;font-weight:700}
+#pg-ip .btn-main{flex:1;background:var(--red);color:white;border:1px solid var(--red);box-shadow:0 6px 15px #a9443523}
+#pg-ip .btn-main:hover{background:#923a2f}
+#pg-ip .btn-main:disabled{opacity:.45;cursor:not-allowed}
+#pg-ip .btn-light{background:#fff;border:1px solid var(--line);color:#615b50}
+#pg-ip .btn-light:hover{border-color:#c5ab7d}
+#pg-ip .preview{min-height:562px;padding:18px;background:#eae5da;display:flex;flex-direction:column}
+#pg-ip .preview-top{display:flex;align-items:center;justify-content:space-between;padding:1px 3px 13px}
+#pg-ip .preview-top h2{font-size:12px;margin:0}
+#pg-ip .status-chip{font-size:9px;color:var(--green);display:flex;align-items:center;gap:6px}
+#pg-ip .status-chip:before{content:"";width:6px;height:6px;border-radius:50%;background:#79a27c}
+#pg-ip .stage{position:relative;flex:1;min-height:405px;border-radius:12px;background:#f2eee5;overflow:hidden;display:grid;place-items:center}
+#pg-ip .stage:before{content:"";position:absolute;inset:12px;border:1px solid #ad9c7d80;border-radius:8px;pointer-events:none;z-index:1}
+#pg-ip .stage:after{content:"城忆造物局  ·  CITY MEMORY";position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#8e826e;font-size:8px;letter-spacing:2px;z-index:2;pointer-events:none}
+#pg-ip .stage-img{display:none;max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:0}
+#pg-ip .stage.ready .stage-img{display:block}
+#pg-ip .placeholder{text-align:center;color:#998e7c}
+#pg-ip .placeholder .glyph{font-size:36px;color:#b29c76}
+#pg-ip .placeholder b{display:block;font:16px "Songti SC",serif;margin:10px 0 5px}
+#pg-ip .placeholder span{font-size:9px}
+#pg-ip .stage.ready .placeholder{display:none}
+#pg-ip .stage.ready:before{border-color:#fff9}
+#pg-ip .stage.ready:after{color:#fff;text-shadow:0 1px 5px #000}
+#pg-ip .busy{display:none;height:4px;margin:12px 3px 0;background:#d9d1c5;border-radius:9px;overflow:hidden}
+#pg-ip .busy i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--gold),var(--red));transition:width .25s}
+#pg-ip .busy.on{display:block}
+#pg-ip .preview-actions{display:flex;gap:8px;margin-top:12px}
+#pg-ip .preview-actions .btn{flex:1}
+#pg-ip .preview-caption{margin:11px 0 0;text-align:center;color:var(--muted);font-size:9px;line-height:1.7}
+#pg-ip .below{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px;margin-top:15px}
+#pg-ip .feature{padding:15px 17px}
+#pg-ip .feature strong{font-size:10px}
+#pg-ip .feature p{font-size:9px;line-height:1.7;color:var(--muted);margin:7px 0 0}
+#pg-ip .feature:first-child{background:#302d27;color:#f8f2e7;border-color:#302d27}
+#pg-ip .feature:first-child p{color:#d0c8b9}
+#pg-ip .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);background:#302d27;color:white;padding:10px 15px;border-radius:10px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
+#pg-ip .toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){
+#pg-ip .workspace{grid-template-columns:1fr}
+#pg-ip .preview{min-height:470px}
+#pg-ip .stage{min-height:340px}
+#pg-ip .below{grid-template-columns:1fr 1fr}
+#pg-ip .feature:first-child{grid-column:span 2}
+}
+@media(max-width:520px){
+
+
+
+#pg-ip .hero{padding:33px 0 25px}
+#pg-ip .hero-meta{display:none}
+#pg-ip .controls{padding:17px}
+#pg-ip .preview{padding:14px;min-height:430px}
+#pg-ip .stage{min-height:305px}
+#pg-ip .styles{gap:5px}
+#pg-ip .swatch{height:47px}
+#pg-ip .below{grid-template-columns:1fr}
+#pg-ip .feature:first-child{grid-column:auto}
+#pg-ip .button-row{flex-wrap:wrap}
+#pg-ip .btn-main{flex-basis:100%}
+}
+
   /* info */
   .doc{display:flex;justify-content:space-between;align-items:center;padding:11px 2px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}
   .doc:last-child{border-bottom:none}
@@ -214,7 +242,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v2.3</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v2.4</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -289,141 +317,37 @@
 
     <!-- ===================== 页3 IP创作 ===================== -->
     <div class="page" id="pg-ip">
-      <h2 class="sec">AI 文创工坊</h2>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="btn sm" id="mIp" onclick="setMode('ip')">🎨 点位 IP 创作</button>
-        <button class="btn ghost sm" id="mShot" onclick="setMode('shot')">📸 AI 旅拍 · 城市装扮</button>
-      </div>
-      <div id="ipFlow">
-        <div class="hero2">
-          <div>
-            <div class="eyebrow2">CITY MEMORY · CREATIVE STUDIO</div>
-            <h1>让城市记忆，成为你的作品</h1>
-            <p>从一张街景照片出发，选择东方风格，创作专属城市文创。<br>你的记忆，是这座城市最独特的素材。</p>
-          </div>
-          <div class="hero-note"><strong>01 / 04</strong>上传照片 · 选择风格 · 生成作品 · 珍藏分享</div>
+<section class="hero"><div><div class="kicker">CITY MEMORY · CREATIVE STUDIO</div><h1>让城市记忆，成为你的作品</h1><p>从一张街景照片出发，选择东方风格，创作专属城市文创。<br>你的记忆，是这座城市最独特的素材。</p></div><div class="hero-meta"><strong>01 / 04</strong>上传照片　·　选择风格　·　生成作品　·　珍藏分享</div></section>
+    <section class="workspace">
+      <section class="panel controls" aria-label="创作设置">
+        <div class="row-head"><h2>创作设置</h2><span class="count">STEP 01　—　03</span></div>
+        <label class="upload" id="upload"><input id="file" type="file" accept="image/*" aria-label="上传城市照片"><img class="upload-img" id="thumb" alt="上传照片预览"><span class="upload-copy"><span class="up-icon">＋</span><b>拖入一张城市记忆，或点击上传</b><span>街巷、建筑、老照片 · JPG / PNG</span></span></label>
+        <p class="privacy">◇　照片在你的浏览器本地处理，不会上传至服务器。</p>
+        <div class="row-head"><h2>选择创作风格</h2><span class="count">STEP 02</span></div>
+        <div class="styles" role="group" aria-label="选择创作风格">
+          <button class="style selected" data-style="gq"><span class="swatch">🏮</span><b>东方国潮</b><small>朱砂 · 鎏金</small></button>
+          <button class="style" data-style="sm"><span class="swatch">🌫️</span><b>水墨宣纸</b><small>墨韵 · 留白</small></button>
+          <button class="style" data-style="jf"><span class="swatch">✂️</span><b>非遗剪纸</b><small>套色 · 刻线</small></button>
+          <button class="style" data-style="xs"><span class="swatch">▦</span><b>复古像素</b><small>颗粒 · 怀旧</small></button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <button class="btn sm" id="mIp" onclick="setMode('ip')">🎨 点位 IP 创作</button>
-          <button class="btn ghost sm" id="mShot" onclick="setMode('shot')">📸 AI 旅拍 · 城市装扮</button>
-        </div>
-        <div class="ws">
-          <div class="pn">
-            <div class="pn-head"><b>创作设置</b><span class="st-label">STEP 01 — 03</span></div>
-            <div class="up2" id="ipUpload" onclick="document.getElementById('f').click()">
-              <img class="upimg" id="upThumb" alt="上传照片预览">
-              <div class="upcontent"><div class="upic">🏮</div><b>拖入一张城市记忆，或点击上传</b><span class="sub">街巷、建筑、老照片 · JPG / PNG</span></div>
-            </div>
-            <p class="helper2">◇ 照片在你的浏览器本地处理，不会上传服务器。上传即视为同意《二创授权协议》。</p>
-            <div style="display:flex;gap:8px">
-              <button class="pbtn2" style="flex:1" onclick="document.getElementById('fc').click()">📷 拍照采集</button>
-              <button class="pbtn2" style="flex:1" onclick="document.getElementById('f').click()">🖼️ 从相册选择</button>
-            </div>
-            <input type="file" id="fc" accept="image/*" capture="user" hidden>
-            <input type="file" id="f" accept="image/*" hidden>
-            <div class="pn-head" style="margin-top:18px"><b>选择创作风格</b><span class="st-label">STEP 02</span></div>
-            <div class="sgrid" id="ipStyles">
-              <button class="scard on" data-f="gq"><span class="art">🏮</span><b>东方国潮</b><small>朱砂 · 鎏金</small></button>
-              <button class="scard" data-f="sm"><span class="art">🌫️</span><b>水墨宣纸</b><small>墨韵 · 留白</small></button>
-              <button class="scard" data-f="jf"><span class="art">✂️</span><b>非遗剪纸</b><small>套色 · 刻线</small></button>
-              <button class="scard" data-f="xs"><span class="art">▦</span><b>复古像素</b><small>颗粒 · 怀旧</small></button>
-            </div>
-            <div class="pn-head" style="margin-top:16px;margin-bottom:7px"><b style="font-size:12px">✍️ 写下你的创作灵感</b><span class="st-label">选填 · AI 云端会采纳</span></div>
-            <textarea class="idea2" id="idea" placeholder="例如：泉水巷口的春日午后，加入窗棂纹样与暖金色……"></textarea>
-            <div style="display:flex;gap:8px;margin-top:12px">
-              <button class="pbtn" id="ipMake" style="flex:1" onclick="genIP()" disabled>✦ 开始创作</button>
-              <button class="pbtn2" onclick="resetIP()">重新选择</button>
-            </div>
-          </div>
-          <div class="pn" style="background:#eee7db;display:flex;flex-direction:column">
-            <div class="pn-head"><b>作品预览</b><span class="chip" id="ipChip">等待创作</span></div>
-            <div id="ipBusy"><div id="ipProg"></div></div>
-            <div class="board" id="ipStage" style="flex:1">
-              <div class="bempty"><div class="bic">▧</div><b>一段城市记忆，正在等候成形</b><span>上传照片，选择风格，开始你的创作</span></div>
-              <img class="fullart" id="ipArt" alt="IP 作品">
-              <div class="wm-line">城忆造物局 · CITY MEMORY</div>
-              <canvas id="ipCanvas" width="340" height="260" hidden></canvas>
-            </div>
-            <div id="ipStat" class="helper2" style="text-align:center">点击「开始创作」：1 秒出风格化作品，AI 云端完成后自动替换并存入相册</div>
-            <div style="display:flex;gap:8px">
-              <button class="pbtn2" style="flex:1" onclick="saveIP(0)">📲 存入相册</button>
-              <button class="pbtn2" style="flex:1" onclick="saveIP(1)">🏛️ 相册+共享墙</button>
-            </div>
-            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="restyleIP()">⟳ 换一种风格（本机秒换 · AI 自动跟进）</button>
-            <div class="helper2" style="text-align:center;margin-bottom:0">存入后原照片自动清除，可直接换一张重新生成</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <div class="ip-feat"><b>✳ 老照片新表达</b><p>为熟悉的街角添上一笔东方色彩，让城市记忆变成可收藏、可分享的作品。</p></div>
-          <div class="ip-feat"><b>创作归你</b><p>图片仅在本地设备处理，作品直接存入你的手机相册与 IP 库。</p></div>
-          <div class="ip-feat"><b>AI 云端创作</b><p>本机 1 秒先出图，flux 模型云端精修后自动替换并存相册。</p></div>
-        </div>
-      </div>
-            <!-- AI 旅拍 · 城市装扮（参考首都博物馆《AI旅拍》模式：风格选择→面部采集→AI实时合成） -->
-      <div id="shotFlow" style="display:none">
-        <div class="hero2">
-          <div>
-            <div class="eyebrow2"><span style="font-size:14px">✳</span> 城市记忆 · 创意再生</div>
-            <h1>把一座城，创作成你的故事</h1>
-            <p>上传一张正面照片，挑选喜欢的旅拍风格，AI 帮你"原地"穿越进老城。</p>
-          </div>
-          <div class="hero-note">每一张老照片，都藏着一段未完待续的城市故事。<br>让记忆换一种方式，继续被看见。</div>
-        </div>
-        <div class="ws">
-          <div class="pn">
-            <div class="pn-head"><b>开始创作</b><span class="st-label">01 — 03</span></div>
-            <div class="helper2" style="margin:0 2px 10px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图可随展览/城市快速复用）</div>
-            <div class="pn-head" style="margin-bottom:8px"><b style="font-size:12px">选择旅拍风格</b><span class="st-label">STEP 01</span></div>
-            <div class="sgrid c3" id="shotStyles"></div>
-            <div class="pn-head" style="margin-top:16px;margin-bottom:8px"><b style="font-size:12px">面部采集</b><span class="st-label">STEP 02</span></div>
-            <div style="display:flex;gap:8px">
-              <button class="pbtn2" style="flex:1" onclick="document.getElementById('sf').click()">🤳 相机拍照采集</button>
-              <button class="pbtn2" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 从相册选择</button>
-            </div>
-            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="openCam('shot')">📹 打开摄像头实时取景拍照（网页取景）</button>
-            <input type="file" id="sf" accept="image/*" capture="user" hidden>
-            <input type="file" id="su" accept="image/*" hidden>
-            <div id="faceReady" style="display:none"></div>
-            <p class="helper2">标准化快节奏流程：选城市主题底图 → 面部采集 → AI 实时合成你的城市装扮形象——无需真实出行，"原地"穿越进老城，全程约 10 秒。</p>
-            <div style="display:flex;gap:8px">
-              <button class="pbtn" id="genBtn" style="flex:1" disabled onclick="genShot()">✦ 生成我的城市旅拍</button>
-              <button class="pbtn2" onclick="resetShot()">重选</button>
-            </div>
-          </div>
-          <div class="pn" style="background:#eee7db;display:flex;flex-direction:column">
-            <div class="pn-head"><b>作品预览</b><span class="chip live">AI 实时合成</span></div>
-            <div class="board" id="shotStage" style="flex:1">
-              <div class="bempty"><div class="bic">▧</div><b>你的灵感，即将成形</b><span>选择风格并完成面部采集，开始创作吧</span></div>
-              <img class="fullart" id="shotArt" alt="城市旅拍作品">
-              <div class="wm-seal">城忆<br>创作</div>
-              <canvas id="shotCanvas" width="576" height="736" hidden></canvas>
-            </div>
-            <div id="shotStat" class="helper2" style="text-align:center">点击「生成我的城市旅拍」：本机立即合成，AI 云端场景随后自动升级</div>
-            <div style="display:flex;gap:8px">
-              <button class="pbtn2" style="flex:1" onclick="saveShot(0)">📲 存入相册</button>
-              <button class="pbtn2" style="flex:1" onclick="saveShot(1)">🏛️ 相册+共享墙</button>
-            </div>
-            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
-            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
-            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="resetShot()">再拍一张</button>
-          </div>
-        </div>
-      </div>
-            <div class="card">
-        <h2 class="sec" style="margin-top:0">我的 IP 库（<span id="ipN">0</span>）</h2>
-        <div id="ipList" class="goods"><div class="muted">还没有作品，去生成第一个吧</div></div>
-      </div>
-      <div class="card">
-        <h2 class="sec" style="margin-top:0">🏛️ 共享作品墙（<span id="sharedN">0</span>）</h2>
-        <div class="drop" onclick="swUpload()">📷 上传照片到共享墙（可一次选多张）<br><span style="font-size:10px">支持批量选择 · 发布后可随时撤回</span></div>
-        <input type="file" id="swIn" accept="image/*" multiple hidden>
-        <div id="sharedList" class="goods mt8"></div>
-        <div class="muted mt8" style="font-size:11px">所有使用者的新作可实时共享到这面墙（同设备多用户即时同步；接入云端后全网共享）。作者可撤回，管理员可下架。</div>
-      </div>
-    </div>
-
-    <!-- ===================== 页4 商城 ===================== -->
-    <div class="page" id="pg-mall">
+        <label class="prompt-title" for="idea">写下你的创作灵感 <span style="font-weight:400;color:var(--muted)">· 可选</span></label>
+        <textarea class="prompt" id="idea" placeholder="例如：泉水巷口的春日午后，加入窗棂纹样与暖金色……"></textarea>
+        <div class="button-row"><button class="btn btn-main" id="make" disabled>✦　开始创作</button><button class="btn btn-light" id="reset">重新选择</button></div>
+      </section>
+      <section class="panel preview" aria-label="作品预览">
+        <div class="preview-top"><h2>作品预览</h2><span class="status-chip" id="status">等待创作</span></div>
+        <div class="stage" id="stage"><img class="stage-img" id="art" alt="创作生成的作品"><div class="placeholder"><div class="glyph">▧</div><b>一段城市记忆，正在等候成形</b><span>上传照片，选择风格，开始你的创作</span></div></div>
+        <div class="busy" id="busy"><i id="progress"></i></div>
+        <div class="preview-actions"><button class="btn btn-light" id="save" disabled>↓　下载高清作品</button><button class="btn btn-light" id="again" disabled>⟳　换一种风格</button></div>
+        <p class="preview-caption">当前提供浏览器本地艺术化处理演示；生成式 AI 需在项目接入图像模型服务后启用。</p>
+      </section>
+    </section>
+    <section class="below"><article class="panel feature"><strong>✳　让老照片，拥有新的表达</strong><p>为熟悉的街角添上一笔东方色彩，让城市记忆变成可收藏、可分享的个人作品。</p></article><article class="panel feature"><strong>创作归你</strong><p>图片仅在本地设备处理。下载作品后，可自行保存或用于个人展示。</p></article><article class="panel feature"><strong>关于 AI 创作</strong><p>本页面的视觉效果是本地算法风格化，不会冒充云端 AI 生成；接入模型后可扩展文生图能力。</p></article></section>
+  
+  <div class="toast" id="proToast" role="status" aria-live="polite"></div>
+  <!-- 共享墙/作品库数据存根（UI 已按 Pro 版移除，仅保持底层兼容） -->
+  <div hidden><span id="ipList"></span><span id="ipN"></span><span id="sharedList"></span><span id="sharedN"></span><input type="file" id="swIn" multiple accept="image/*"></div>
+  <div class="page" id="pg-mall"><div class="page" id="pg-mall">
       <div class="vip">
         <div class="b">城忆会员 · ¥18/季</div>
         <div class="s">订制款免加印费 ｜ 科普课程全年畅学 ｜ 每月 2 次抽奖</div>
@@ -564,26 +488,6 @@
   <button class="btn ghost sm mt8" style="width:100%" onclick="closeAuth()">先逛逛 · 游客模式</button>
 </div>
 
-<!-- 网页摄像头拍照（getUserMedia，电脑/部分手机可直接取景） -->
-<div id="camMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:140" onclick="closeCam()"></div>
-<div id="camBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,92%);background:#111;border-radius:16px;padding:12px;z-index:141;box-shadow:0 18px 50px rgba(0,0,0,.4)">
-  <div style="color:#fff;font-size:13px;margin-bottom:8px;text-align:center">📹 网页摄像头拍照 · 面向镜头取景</div>
-  <video id="camVideo" autoplay playsinline muted style="width:100%;border-radius:10px;background:#000;aspect-ratio:3/4;object-fit:cover"></video>
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <button class="btn gold" style="flex:1" onclick="camSnap()">📷 拍下这一帧</button>
-    <button class="btn ghost sm" onclick="closeCam()">取消</button>
-  </div>
-</div>
-
-<!-- 保存到手机相册（微信内长按保存） -->
-<div id="saveMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:130" onclick="closeSave()"></div>
-<div id="saveBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,88%);background:#fffdf8;border-radius:16px;padding:14px;z-index:131;box-shadow:0 18px 50px rgba(0,0,0,.35)">
-  <div style="font-weight:bold;margin-bottom:8px">📲 保存到手机相册</div>
-  <img id="saveImg" style="width:100%;border-radius:10px;border:1px solid var(--line)">
-  <div class="muted mt8" style="font-size:12px">微信内：<b>长按上方图片 → 保存图片</b>；其他浏览器已自动下载到本地。</div>
-  <button class="btn sm mt8" style="width:100%" onclick="closeSave()">完成</button>
-</div>
-
 <!-- 模拟系统短信通知 -->
 <div id="smsBanner" style="display:none;position:fixed;left:50%;top:16px;transform:translateX(-50%);width:min(340px,92%);background:#fff;border-radius:14px;z-index:120;box-shadow:0 12px 36px rgba(0,0,0,.3);overflow:hidden">
   <div style="background:#f2f2f2;padding:7px 14px;font-size:12px;color:#666;display:flex;justify-content:space-between"><span>短信 · 10690</span><span>现在</span></div>
@@ -606,6 +510,20 @@
 <div id="toast" style="position:fixed;left:50%;top:12%;transform:translateX(-50%);background:#2b2118;color:#fff;
   padding:9px 18px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:99;pointer-events:none"></div>
 
+<script>
+/* ===== 城忆造物局 Pro 创作台（1:1 移植） ===== */
+
+    const file=document.getElementById('file'),upload=document.getElementById('upload'),thumb=document.getElementById('thumb'),make=document.getElementById('make'),stage=document.getElementById('stage'),art=document.getElementById('art'),progress=document.getElementById('progress'),busy=document.getElementById('busy'),status=document.getElementById('status');let original='',output='',style='gq',toastTimer=0;
+    function say(text){const t=document.getElementById('proToast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+    function useFile(f){if(!f)return;if(!f.type.startsWith('image/')){say('请选择图片文件');return}if(original)URL.revokeObjectURL(original);original=URL.createObjectURL(f);thumb.src=original;upload.classList.add('has-image');make.disabled=false;document.getElementById('again').disabled=true;stage.classList.remove('ready');say('照片已载入，选择风格开始创作')}
+    file.addEventListener('change',e=>useFile(e.target.files[0]));['dragenter','dragover'].forEach(n=>upload.addEventListener(n,e=>{e.preventDefault();upload.classList.add('drag')}));['dragleave','drop'].forEach(n=>upload.addEventListener(n,e=>{e.preventDefault();upload.classList.remove('drag')}));upload.addEventListener('drop',e=>useFile(e.dataTransfer.files[0]));
+    document.querySelectorAll('.style').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.style').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');style=b.dataset.style;if(original&&stage.classList.contains('ready'))paint()}));
+    const lum=(r,g,b)=>.2126*r+.7152*g+.0722*b;
+    function process(c){const ctx=c.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,c.width,c.height),d=im.data,w=c.width,h=c.height;if(style==='xs'){const small=document.createElement('canvas'),sw=Math.max(24,Math.round(w/17)),sh=Math.max(24,Math.round(h/17));small.width=sw;small.height=sh;const s=small.getContext('2d',{willReadFrequently:true});s.drawImage(c,0,0,sw,sh);const px=s.getImageData(0,0,sw,sh),p=px.data;for(let i=0;i<p.length;i+=4){for(let j=0;j<3;j++)p[i+j]=Math.round(p[i+j]/51)*51;p[i+3]=255}s.putImageData(px,0,0);ctx.clearRect(0,0,w,h);ctx.imageSmoothingEnabled=false;ctx.drawImage(small,0,0,w,h);ctx.imageSmoothingEnabled=true;return}const gray=new Float32Array(w*h);for(let i=0,p=0;i<d.length;i+=4,p++)gray[p]=lum(d[i],d[i+1],d[i+2]);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let q=y*w+x,i=q*4,v=gray[q],edge=0;if(x>0&&x<w-1&&y>0&&y<h-1){const gx=-gray[q-w-1]+gray[q-w+1]-2*gray[q-1]+2*gray[q+1]-gray[q+w-1]+gray[q+w+1],gy=-gray[q-w-1]-2*gray[q-w]-gray[q-w+1]+gray[q+w-1]+2*gray[q+w]+gray[q+w+1];edge=Math.min(75,Math.hypot(gx,gy)*.22)}if(style==='sm'){let a=Math.max(0,Math.min(255,v*.84+35-edge));d[i]=a*.94+15;d[i+1]=a*.96+12;d[i+2]=a+4}else if(style==='jf'){let a=edge>180?[63,34,27]:v<90?[128,38,34]:v<160?[186,53,43]:v<210?[220,153,80]:[248,239,217];d[i]=a[0];d[i+1]=a[1];d[i+2]=a[2]}else{let a=v<75?[79,40,34]:v<145?[166,52,41]:v<205?[197,146,73]:[245,232,204];d[i]=a[0];d[i+1]=a[1];d[i+2]=a[2]}d[i+3]=255}ctx.putImageData(im,0,0);if(style==='sm'){ctx.globalAlpha=.12;ctx.fillStyle='#665f51';for(let k=0;k<w*h/2400;k++)ctx.fillRect((k*7919)%w,(k*104729)%h,1.2,1.2);ctx.globalAlpha=1}}
+    function paint(){if(!original)return;make.disabled=true;busy.classList.add('on');progress.style.width='10%';status.textContent='构思画面中';const img=new Image();img.onload=()=>{try{const scale=Math.min(1,1300/img.width,1300/img.height),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d',{willReadFrequently:true}).drawImage(img,0,0,c.width,c.height);progress.style.width='45%';status.textContent='正在铺陈艺术风格';setTimeout(()=>{try{process(c);if(output)URL.revokeObjectURL(output);output=c.toDataURL('image/png');art.onload=()=>{stage.classList.add('ready');make.disabled=false;document.getElementById('save').disabled=false;document.getElementById('again').disabled=false;busy.classList.remove('on');progress.style.width='100%';status.textContent='作品已完成';say('作品已生成，可下载高清图')};art.src=output}catch(e){make.disabled=false;busy.classList.remove('on');status.textContent='处理失败';say('处理失败，请选择较小图片')}},50)}catch(e){make.disabled=false;busy.classList.remove('on');say('图片读取失败')}};img.onerror=()=>{make.disabled=false;busy.classList.remove('on');say('图片读取失败，请重选')};img.src=original}
+    make.addEventListener('click',paint);document.getElementById('again').addEventListener('click',paint);document.getElementById('save').addEventListener('click',()=>{if(!output)return;const a=document.createElement('a');a.href=output;a.download='城忆-城市记忆-'+style+'.png';a.click();say('高清作品已下载')});document.getElementById('reset').addEventListener('click',()=>{if(original)URL.revokeObjectURL(original);if(output)URL.revokeObjectURL(output);original='';output='';file.value='';thumb.removeAttribute('src');art.removeAttribute('src');upload.classList.remove('has-image');stage.classList.remove('ready');busy.classList.remove('on');make.disabled=true;document.getElementById('save').disabled=true;document.getElementById('again').disabled=true;progress.style.width='0';status.textContent='等待创作';say('已重置创作台')});
+  
+</script>
 <script>
 /* ---------- 数据 ---------- */
 const PTS=[
@@ -954,393 +872,46 @@ function redeem(){
   a.pts-=60;userPts=a.pts;saveDB();refreshMe();
   toast('兑换成功：精美书签已加入订单，收货信息在「我的」页完善');
 }
-
-/* ---------- IP 工坊 ---------- */
-const FL={gq:'saturate(1.7) contrast(1.15) hue-rotate(-8deg)',sm:'grayscale(1) contrast(1.35) brightness(1.05)',
-  jf:'saturate(2.2) contrast(1.9) brightness(1.1)',xs:'saturate(1.4) contrast(1.5)'};
-const FN={gq:'国潮插画',sm:'水墨',jf:'剪纸',xs:'像素'};
-let curFile=null, curStyle='gq', ipCount=0, ipGenSeq=0;
-const fi=document.getElementById('f');
-/* ipPick 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
-/* 结果上屏：把离屏 canvas 导出为干净大图（参考版式：全幅作品，无烘焙装饰） */
-function ipShow(c){document.getElementById('ipArt').src=c.toDataURL('image/png')}
-function shotShow(c){document.getElementById('shotArt').src=c.toDataURL('image/png')}
-/* 预览区状态徽章（Pro 版能力） */
-function ipChip(t,cls){const el=document.getElementById('ipChip');if(!el)return;el.textContent=t;el.className='chip'+(cls?' '+cls:'')}
-function ipPick(src){
-  if(!src)return;
-  curFile=src;
-  const up=document.getElementById('ipUpload');
-  document.getElementById('upThumb').src=src;
-  up.classList.add('has-img');
-  ipChip('照片已载入','');
-  document.getElementById('ipMake').disabled=false;
-  document.getElementById('ipStage').classList.remove('ready');
-  document.getElementById('ipArt').removeAttribute('src');
-  ipProgOff();
-  toast('照片已载入，选择风格开始创作');
-}
-fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)ipPick(URL.createObjectURL(f))});
-document.getElementById('fc').addEventListener('change',e=>{const f=e.target.files[0];if(f)ipPick(URL.createObjectURL(f))});
-/* 电脑端拖拽上传（Pro 版能力）：把图片直接拖进上传框即可载入 */
-(function(){
-  const alb=document.getElementById('ipUpload');if(!alb)return;
-  ['dragenter','dragover'].forEach(n=>alb.addEventListener(n,e=>{e.preventDefault();alb.classList.add('drag')}));
-  ['dragleave','drop'].forEach(n=>alb.addEventListener(n,e=>{e.preventDefault();alb.classList.remove('drag')}));
-  alb.addEventListener('drop',e=>{const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))ipPick(URL.createObjectURL(f));else if(f)toast('请拖入图片文件')});
-})();
-/* 进度条（Pro 版能力）：本机阶段推进真实进度，AI 阶段呼吸式流动 */
-function ipProgress(p,ai){
-  const b=document.getElementById('ipBusy'),el=document.getElementById('ipProg');
-  b.style.display='block';b.classList.toggle('ai',!!ai);
-  if(p!=null)el.style.width=p+'%';
-}
-function ipProgOff(){
-  const b=document.getElementById('ipBusy');
-  b.style.display='none';b.classList.remove('ai');
-  document.getElementById('ipProg').style.width='0';
-}
-/* 换一种风格：按 国潮→水墨→剪纸→像素 循环，本机秒换，AI 自动跟进重画 */
-function restyleIP(){
-  const FK=['gq','sm','jf','xs'],i=FK.indexOf(curStyle);
-  curStyle=FK[(i+1)%FK.length];
-  document.querySelectorAll('#ipStyles button').forEach(x=>x.classList.toggle('on',x.dataset.f===curStyle));
-  toast('已切换为「'+FN[curStyle]+'」· 重新创作中');
-  genIP();
-}
-document.querySelectorAll('#ipStyles button').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('#ipStyles button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on'); curStyle=b.dataset.f;
-}));
 /* AI 云端文生图（免费公共服务，无需密钥；失败时回退本机滤镜合成）
    v1.9：显式指定 flux 高质量模型（与主流 AI 绘画 App 同源架构），
    90 秒长超时，safe=false 允许地标建筑等正常内容，private=true 不公开画廊 */
-function aiImage(prompt,w,h){
-  const u='https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)
-    +'?width='+w+'&height='+h+'&nologo=true&private=true&safe=false'
-    +'&model=flux&seed='+Math.floor(Math.random()*1000000);
-  return new Promise((res,rej)=>{
-    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),90000);
-    fetch(u,{signal:ctl.signal})
-      .then(r=>{
-        if(!r.ok){const e=new Error('http '+r.status);e.rate=(r.status===402||r.status===429);throw e}
-        return r.blob();
-      })
-      .then(b=>{clearTimeout(t);res(URL.createObjectURL(b))})
-      .catch(e=>{clearTimeout(t);rej(e)});
-  });
-}
+
 /* 自动重试版：免费通道限流时自动排队重试最多 3 次（onWait(n) 通知 UI 第 n 次重试） */
-function aiWithRetry(prompt,w,h,onWait){
-  return aiImage(prompt,w,h).catch(e=>{
-    if(!e.rate)throw e; /* 非限流错误不重试 */
-    if(onWait)onWait(1);
-    return new Promise(r=>setTimeout(r,30000)).then(()=>aiImage(prompt,w,h)).catch(e2=>{
-      if(!e2.rate)throw e2;
-      if(onWait)onWait(2);
-      return new Promise(r=>setTimeout(r,30000)).then(()=>aiImage(prompt,w,h));
-    });
-  });
-}
+
 /* 生成阶段文案：像市面 App 一样显示"排队→构图→渲染细节" */
-function aiStage(sec){
-  if(sec<10)return '正在排队调度算力';
-  if(sec<30)return '正在构图生成';
-  return '正在渲染细节（flux 精修）';
-}
+
 /* 羽化融合人脸：径向渐变蒙版让边缘自然过渡（替代硬边圆形贴图），外圈加柔和光晕 */
-function blendFace(ctx,face,cx,cy,r){
-  /* 先画一圈柔和光晕承托 */
-  const gl=ctx.createRadialGradient(cx,cy,r*0.9,cx,cy,r*1.35);
-  gl.addColorStop(0,'rgba(255,252,244,.55)');gl.addColorStop(1,'rgba(255,252,244,0)');
-  ctx.fillStyle=gl;ctx.beginPath();ctx.arc(cx,cy,r*1.35,0,7);ctx.fill();
-  /* 离屏画布：贴照片后用 destination-in 径向渐变抠出羽化边缘 */
-  const fc=document.createElement('canvas');fc.width=fc.height=Math.round(r*2);
-  const fx=fc.getContext('2d');
-  const s=Math.max(r*2/face.width,r*2/face.height)*1.18;
-  fx.drawImage(face,r-face.width*s/2,r-face.height*s/2,face.width*s,face.height*s);
-  fx.globalCompositeOperation='destination-in';
-  const g=fx.createRadialGradient(r,r,r*0.58,r,r,r);
-  g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.82,'rgba(0,0,0,.92)');g.addColorStop(1,'rgba(0,0,0,0)');
-  fx.fillStyle=g;fx.fillRect(0,0,r*2,r*2);
-  ctx.drawImage(fc,cx-r,cy-r);
-}
+
 /* 在画布上按 cover 方式铺满绘制图片 */
-function drawCover(ctx,img,x,y,w,h){
-  const s=Math.max(w/img.width,h/img.height);
-  ctx.drawImage(img,x+(w-img.width*s)/2,y+(h-img.height*s)/2,img.width*s,img.height*s);
-}
+
 /* 公共收尾：印章 + 标题栏 */
-function stampSeal(ctx,cw,ch){
-  ctx.filter='none';
-  ctx.fillStyle='#b03a2e';ctx.beginPath();ctx.roundRect(cw-78,ch-70,52,42,6);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 15px serif';ctx.textAlign='center';
-  ctx.fillText('城忆',cw-52,ch-50);ctx.fillText('监制',cw-52,ch-33);
-}
+
 /* ---------- 高级风格化引擎（像素级实现，iOS/Safari 全兼容，不依赖 ctx.filter） ---------- */
-function lumOf(r,g,b){return r*0.299+g*0.587+b*0.114}
+
 /* 多段色带映射：把照片亮度映射到"大师配色"上（电影调色同款技术） */
-function ramp(t,stops){
-  t=Math.max(0,Math.min(1,t));
-  for(let k=1;k<stops.length;k++){
-    if(t<=stops[k][0]){
-      const a=stops[k-1],b=stops[k],f=(t-a[0])/((b[0]-a[0])||1);
-      return [a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f,a[3]+(b[3]-a[3])*f];
-    }
-  }
-  const s=stops[stops.length-1];return [s[1],s[2],s[3]];
-}
-const RAMPS={
-  /* 国潮：玄墨→朱砂→正红→鎏金→米白（故宫配色） */
-  gq:[[0,30,16,20],[.32,150,34,28],[.58,214,74,42],[.78,236,178,80],[1,250,240,218]],
-  /* 水墨：宣纸白→淡墨→中墨→浓墨（暖灰调，不死黑） */
-  sm:[[0,250,246,236],[.45,196,190,178],[.75,110,108,104],[1,36,35,40]],
-  /* 剪纸：宣纸→正红→深红→玄黑 */
-  jf:[[0,247,239,223],[.5,198,58,42],[.8,142,32,24],[1,32,24,20]],
-  xs:null /* 像素：16 色量化 + 抖动 */
-};
-const XSPAL=[[26,28,44],[68,58,112],[122,90,160],[196,120,90],[236,168,84],[250,222,120],[120,188,120],[64,140,120],[44,90,120],[90,160,196],[200,230,240],[244,246,250],[180,60,50],[250,120,100],[92,60,40],[160,200,90]];
-const BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
-function styleFX(cv,style){
-  const cx=cv.getContext('2d'),w=cv.width,h=cv.height;
-  if(style==='sm'){ /* 水墨先做一次廉价模糊（1/4 降采样再放大），模拟墨晕 */
-    const sm=document.createElement('canvas');sm.width=Math.max(1,w>>2);sm.height=Math.max(1,h>>2);
-    sm.getContext('2d').drawImage(cv,0,0,sm.width,sm.height);
-    cx.imageSmoothingEnabled=true;cx.clearRect(0,0,w,h);cx.drawImage(sm,0,0,sm.width,sm.height,0,0,w,h);
-  }
-  const d=cx.getImageData(0,0,w,h),p=d.data;
-  /* Sobel 勾线（Pro 版算法）：国潮/剪纸/水墨提取边缘加深刻线，接近手绘勾线感 */
-  const useEdge=(style==='gq'||style==='jf'||style==='sm');
-  let gray=null;
-  if(useEdge&&w>2&&h>2){
-    gray=new Float32Array(w*h);
-    for(let q=0,i=0;q<w*h;q++,i+=4)gray[q]=p[i]*.2126+p[i+1]*.7152+p[i+2]*.0722;
-  }
-  const spread=style==='xs'?36:0; /* 像素风：拜耳 4×4 有序抖动幅度 */
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const q=y*w+x,i=q*4;
-      const r=p[i],g=p[i+1],b=p[i+2];
-      if(style==='xs'){
-        const dv=(BAYER[y&3][x&3]/16-.5)*spread;
-        let best=0,bd=1e9;
-        for(let k=0;k<XSPAL.length;k++){
-          const c=XSPAL[k],dr=c[0]-(r+dv),dg=c[1]-(g+dv),db=c[2]-(b+dv),dist=dr*dr+dg*dg+db*db;
-          if(dist<bd){bd=dist;best=k}
-        }
-        const c=XSPAL[best];p[i]=c[0];p[i+1]=c[1];p[i+2]=c[2];
-      }else{
-        let edge=0;
-        if(useEdge&&x>0&&x<w-1&&y>0&&y<h-1){
-          const gx=-gray[q-w-1]+gray[q-w+1]-2*gray[q-1]+2*gray[q+1]-gray[q+w-1]+gray[q+w+1],
-                gy=-gray[q-w-1]-2*gray[q-w]-gray[q-w+1]+gray[q+w-1]+2*gray[q+w]+gray[q+w+1];
-          edge=Math.min(70,Math.hypot(gx,gy)*.2);
-        }
-        const m=ramp(lumOf(r,g,b)/255,RAMPS[style]);
-        const k=(style==='sm')?.88:.78; /* 水墨更纯，其他保留 22% 原色信息 */
-        p[i]=Math.max(0,m[0]*k+r*(1-k)-edge);
-        p[i+1]=Math.max(0,m[1]*k+g*(1-k)-edge);
-        p[i+2]=Math.max(0,m[2]*k+b*(1-k)-edge);
-      }
-    }
-  }
-  cx.putImageData(d,0,0);
-  if(style==='sm'){ /* 宣纸颗粒：随机细噪点模拟纸面肌理（Pro 版算法） */
-    cx.globalAlpha=.1;cx.fillStyle='#665f51';
-    const n=Math.round(w*h/2400);
-    for(let k=0;k<n;k++)cx.fillRect((k*7919)%w,(k*104729)%h,1.2,1.2);
-    cx.globalAlpha=1;
-  }
-}
+
+
 /* 像素风专属：缩小再最近邻放大，产生大色块 */
-function pixBlock(off,w,h,n){
-  n=n||9;
-  const sm=document.createElement('canvas');sm.width=Math.max(4,Math.round(w/n));sm.height=Math.max(4,Math.round(h/n));
-  const sctx=sm.getContext('2d');sctx.drawImage(off,0,0,sm.width,sm.height);
-  const octx=off.getContext('2d');octx.imageSmoothingEnabled=false;
-  octx.clearRect(0,0,w,h);octx.drawImage(sm,0,0,sm.width,sm.height,0,0,w,h);
-  octx.imageSmoothingEnabled=true;
-}
+
 /* 统一管线：任意图源（用户照片 / AI 图）→ 指定风格成品，观感一致 */
-function renderStyled(img,w,h,style){
-  const off=document.createElement('canvas');off.width=w;off.height=h;
-  const octx=off.getContext('2d');
-  drawCover(octx,img,0,0,w,h);
-  if(style==='xs')pixBlock(off,w,h,Math.max(6,Math.round(w/30)));
-  styleFX(off,style);
-  return off;
-}
+
 /* 各风格的"装裱"：边框 + 装饰，一风格一个档次 */
-function frameStyle(ctx,style,x,y,w,h){
-  ctx.filter='none';
-  if(style==='gq'){ /* 国潮：外朱红内鎏金双线 + 四角金铆 */
-    ctx.strokeStyle='#8f2a20';ctx.lineWidth=5;ctx.beginPath();ctx.roundRect(x-3,y-3,w+6,h+6,40);ctx.stroke();
-    ctx.strokeStyle='#c9963c';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x+4,y+4,w-8,h-8,30);ctx.stroke();
-    ctx.fillStyle='#c9963c';
-    [[x+13,y+13],[x+w-13,y+13],[x+13,y+h-13],[x+w-13,y+h-13]].forEach(pt=>{
-      ctx.beginPath();ctx.arc(pt[0],pt[1],6,0,7);ctx.fill();
-    });
-  }else if(style==='sm'){ /* 水墨：细墨框 + 左下朱印「忆」 */
-    ctx.strokeStyle='#2a2a30';ctx.lineWidth=1.6;ctx.strokeRect(x-4,y-4,w+8,h+8);
-    ctx.fillStyle='#a5261c';ctx.fillRect(x+8,y+h-34,26,26);
-    ctx.fillStyle='#f5efe2';ctx.font='bold 17px serif';ctx.textAlign='center';ctx.fillText('忆',x+21,y+h-14);
-  }else if(style==='jf'){ /* 剪纸：锯齿花边（粗虚线）+ 四角折角 */
-    ctx.strokeStyle='#b03a2e';ctx.lineWidth=7;ctx.setLineDash([12,7]);
-    ctx.strokeRect(x-5,y-5,w+10,h+10);ctx.setLineDash([]);
-    ctx.fillStyle='#b03a2e';
-    ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+17,y-5);ctx.lineTo(x-5,y+17);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(x+w+5,y-5);ctx.lineTo(x+w-17,y-5);ctx.lineTo(x+w+5,y+17);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(x-5,y+h+5);ctx.lineTo(x+17,y+h+5);ctx.lineTo(x-5,y+h-17);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(x+w+5,y+h+5);ctx.lineTo(x+w-17,y+h+5);ctx.lineTo(x+w+5,y+h-17);ctx.closePath();ctx.fill();
-  }else{ /* 像素：黑底描边 + 内嵌白线（8-bit 电视框） */
-    ctx.fillStyle='#1a1c2c';
-    ctx.fillRect(x-6,y-6,w+12,4);ctx.fillRect(x-6,y+h+2,w+12,4);
-    ctx.fillRect(x-6,y-6,4,h+12);ctx.fillRect(x+w+2,y-6,4,h+12);
-    ctx.fillStyle='#f4f6fa';
-    ctx.fillRect(x-2,y-2,w+4,1);ctx.fillRect(x-2,y+h+1,w+4,1);
-  }
-}
+
 /* 按风格选 AI 提示词：专业级中英混合长提示词（flux 对英文理解最佳，中文地标保证内容准确） */
-const FQ=', masterpiece, best quality, highly detailed, trending on behance, museum grade artwork, 8k';
-const FP={
-  gq:'Chinese Guochao national trend illustration poster, ornate gold outline lines, vermilion red and crimson color clash, auspicious cloud patterns decoration, symmetrical composition, Forbidden City cultural creative poster style, elegant flat illustration with rich texture details, ',
-  sm:'Traditional Chinese ink wash painting shuimo, five shades of ink from pale to deep black, vast negative space liubai, expressive dry-brush flying-white strokes, xuan rice paper texture, distant misty mountains, minimalist zen composition, Song dynasty masterpiece style, ',
-  jf:'Chinese folk paper-cut art jianzhi, bright vermilion red hollow-out paper cutting, symmetrical window flower lattice patterns, cream white background, flat solid colors without gradients, intricate lace edge details, intangible cultural heritage craftsmanship, ',
-  xs:'retro pixel art game scene, 16-color limited palette, 8-bit pixel style, crisp blocky pixel clusters, dithering shading technique, classic 16-bit SNES JRPG aesthetic, clean pixel grid alignment, '
-};
-function genIP(){
-  /* Pro 版式：单卡创作台，无分步面板，直接点亮预览区 */
-  const stg=document.getElementById('ipStage');
-  stg.classList.add('ready');
-  ipChip('AI 创作中','busy');
-  const g=++ipGenSeq; /* 生成令牌：「换一种风格」重入时旧 AI 结果作废 */
-  const c=document.getElementById('ipCanvas'),ctx=c.getContext('2d');
-  const stat=document.getElementById('ipStat');
-  const land=cur!=null?PTS[cur].n:'自定义点位';
-  const idea=(document.getElementById('idea').value||'').trim();
-  /* 第一步：本机像素级风格化（1 秒内出图，与原图明显不同） */
-  ipProgress(18);
-  ipLocal(ctx,c,stat,land,true,()=>ipProgress(58));
-  setTimeout(()=>{if(g===ipGenSeq)ipProgress(58)},700); /* 兜底推进 */
-  toast('本机合成约 1 秒 · AI 云端高清创作约 15~40 秒，完成后自动替换并存相册');
-  /* 第二步：AI 云端创作，成功后自动替换并自动存相册 */
-  stat.textContent='⏳ AI 云端创作中 · 正在排队调度算力（本机结果已生成，AI 完成后自动替换）';
-  ipProgress(null,true);
-  const t0=Date.now();
-  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · '+aiStage(Math.round((Date.now()-t0)/1000))+'（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt=FP[curStyle]+land+(idea?'，创作意象：'+idea:'')+' '+FQ;
-  aiWithRetry(prompt,768,512,n=>{
-    if(g!==ipGenSeq)return;
-    stat.textContent='🔄 免费通道排队中，已自动第 '+(n+1)+' 次尝试（共 3 次）';
-  }).then(url=>{
-    if(g!==ipGenSeq)return;
-    const img=new Image();
-    img.onload=()=>{
-      if(g!==ipGenSeq)return;
-      clearInterval(tick);
-      ipProgOff();
-      /* AI 图全幅高清风格化（干净大图，装饰交给页面水印层） */
-      const off=renderStyled(img,960,720,curStyle);
-      c.width=960;c.height=720;
-      ctx.drawImage(off,0,0);
-      ipShow(c);
-      stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
-      ipChip('作品已完成','ok');
-      saveToAlbum(c,'城忆-IP作品-AI.png');
-    };
-    img.onerror=()=>{if(g!==ipGenSeq)return;clearInterval(tick);ipProgOff();autoSaveLocal(c,stat,'AI 结果加载失败')};
-    img.src=url;
-  }).catch(()=>{if(g!==ipGenSeq)return;clearInterval(tick);ipProgOff();autoSaveLocal(c,stat,'AI 通道重试 3 次后仍限流')});
-}
+
 /* AI 不可用时：自动把本机像素风格化结果存入相册 */
-function autoSaveLocal(c,stat,why){
-  stat.textContent='⚠️ '+why+'，已自动将本机风格化结果存入相册（可稍后重试 AI）';
-  ipChip('已完成（本机）','ok');
-  saveToAlbum(c,'城忆-IP作品.png');
-}
+
 /* 本机回退：像素级风格化合成（与原图明显不同，iOS 全兼容；done 完成回调供进度条用） */
-function ipLocal(ctx,c,stat,land,quiet,done){
-  const img=new Image();
-  img.onload=()=>{
-    /* 全幅高清风格化（与参考版式一致：干净大图，装饰交给页面水印层） */
-    const W=960,H=720;
-    const off=renderStyled(img,W,H,curStyle);
-    c.width=W;c.height=H;
-    ctx.drawImage(off,0,0);
-    ipShow(c);
-    if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机风格化合成（稍后可重试 AI 生成）';
-    if(done)done();
-  };
-  img.onerror=()=>{if(!quiet)stat.textContent='⚠️ 请先在上传步骤选择照片';if(done)done()};
-  img.src=curFile;
-}
-function saveIP(share){
-  const a=acc();
-  a.ip=(a.ip||0)+1;
-  /* 生成缩略图存入本地作品库（最多 12 张，防止存储溢出） */
-  const src=document.getElementById('ipCanvas');
-  const tc=document.createElement('canvas');tc.width=150;tc.height=120;
-  tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,120);
-  const title='IP作品 #'+a.ip+' · '+(cur!=null?PTS[cur].n:'自定义')+' · '+FN[curStyle]+'风';
-  a.gallery=a.gallery||[];
-  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
-  if(a.gallery.length>12)a.gallery.pop();
-  saveDB();refreshMe();
-  /* 直接存入手机相册（微信内弹长按保存，浏览器内自动下载） */
-  saveToAlbum(src,'城忆-IP作品-'+a.ip+'.png');
-  toast(share?'已存入相册与我的 IP 库，并发布到共享作品墙':'已存入手机相册与我的 IP 库');
-  if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
-  resetIP();
-}
+
+
 /* 保存到手机相册：微信内长按保存；普通浏览器触发下载 */
-function saveToAlbum(cv,name){
-  let url;
-  try{url=cv.toDataURL('image/png')}catch(e){toast('保存失败：图片包含跨域资源');return}
-  document.getElementById('saveImg').src=url;
-  document.getElementById('saveMask').style.display='block';
-  document.getElementById('saveBox').style.display='block';
-  if(!/MicroMessenger/i.test(navigator.userAgent)){
-    const a=document.createElement('a');a.href=url;a.download=name;
-    document.body.appendChild(a);a.click();a.remove();
-  }
-}
-function closeSave(){document.getElementById('saveMask').style.display='none';document.getElementById('saveBox').style.display='none'}
+
+
 /* ---------- 网页摄像头拍照（getUserMedia） ---------- */
 let camStream=null,camTarget=null;
-function openCam(target){
-  camTarget=target;
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持网页摄像头，请用「相机拍照」按钮');return}
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:720}},audio:false})
-    .then(stream=>{
-      camStream=stream;
-      document.getElementById('camVideo').srcObject=stream;
-      document.getElementById('camMask').style.display='block';
-      document.getElementById('camBox').style.display='block';
-    })
-    .catch(()=>{toast('无法访问摄像头：请允许浏览器使用摄像头权限，或改用「相机拍照/相册选择」')});
-}
-function closeCam(){
-  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
-  document.getElementById('camMask').style.display='none';
-  document.getElementById('camBox').style.display='none';
-}
-function camSnap(){
-  const v=document.getElementById('camVideo');
-  if(!v.videoWidth){toast('摄像头画面尚未就绪，请稍候再拍');return}
-  const c=document.createElement('canvas');
-  c.width=480;c.height=640;
-  const ctx=c.getContext('2d');
-  /* 按竖版 cover 裁切视频画面 */
-  const s=Math.max(480/v.videoWidth,640/v.videoHeight);
-  ctx.drawImage(v,(480-v.videoWidth*s)/2,(640-v.videoHeight*s)/2,v.videoWidth*s,v.videoHeight*s);
-  const data=c.toDataURL('image/jpeg',0.85);
-  closeCam();
-  if(camTarget==='shot'){
-    shotPicked(data);
-  }else if(camTarget==='ip'){
-    ipPick(data);
-  }
-}
+
+
+
 /* 共享作品墙：所有使用者可实时看到彼此发布的新作品 */
 function publishShared(d,t){
   DB.shared.unshift({id:Date.now()+Math.random().toString(36).slice(2,5),d:d,t:t,w:accName(),ts:Date.now()});
@@ -1389,153 +960,10 @@ document.getElementById('swIn').addEventListener('change',e=>{
     img.src=URL.createObjectURL(f);
   });
 });
-function resetIP(){
-  curFile=null; document.getElementById('f').value=''; document.getElementById('fc').value='';
-  ipGenSeq++; /* 作废进行中的 AI 请求 */
-  ipProgOff();
-  document.getElementById('idea').value='';
-  const up=document.getElementById('ipUpload');
-  up.classList.remove('has-img');
-  document.getElementById('upThumb').removeAttribute('src');
-  document.getElementById('ipMake').disabled=true;
-  ipChip('等待创作','');
-  document.getElementById('ipStage').classList.remove('ready');
-  document.getElementById('ipArt').removeAttribute('src');
-  toast('已重置创作台，可换一张照片重新开始');
-}
-
-/* ---------- 模式切换：IP 创作 / AI 旅拍 ---------- */
-function setMode(m){
-  document.getElementById('ipFlow').style.display=m==='ip'?'block':'none';
-  document.getElementById('shotFlow').style.display=m==='shot'?'block':'none';
-  document.getElementById('mIp').className=m==='ip'?'btn sm':'btn ghost sm';
-  document.getElementById('mShot').className=m==='shot'?'btn sm':'btn ghost sm';
-}
-
-/* ---------- AI 旅拍 · 城市装扮 ---------- */
-const SHOTS=[
- {n:"泉城名士 · 宋风",bg:"趵突泉 · 泺源堂",sky:["#f7e8c8","#e6cd9c"],robe:"#3d6b6b",acc:"#2b4a4a",hat:"🎩"},
- {n:"民国学生 · 老商埠",bg:"老济南站 · 钟楼",sky:["#e8eef5","#cfdde8"],robe:"#6b7d96",acc:"#31567d",hat:"🎓"},
- {n:"荷风仙子 · 大明湖",bg:"大明湖 · 超然楼",sky:["#fdeef2","#f6d7e2"],robe:"#c96a7e",acc:"#a13d5a",hat:"🌸"},
-];
-let shotStyle=0, shotFile=null, shotCount=0;
-document.getElementById('shotStyles').innerHTML=SHOTS.map((s,i)=>
-  `<button data-i="${i}" class="scard${i===0?' on':''}"><span class="art">${s.hat}</span><b>${s.n}</b><small>${s.bg}</small></button>`).join('');
-document.getElementById('shotStyles').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  document.querySelectorAll('#shotStyles button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on'); shotStyle=+b.dataset.i;
-  document.getElementById('shotStyleName').textContent=SHOTS[shotStyle].n;
-  document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
-  toast('已选择「'+SHOTS[shotStyle].n+'」，请完成面部采集');
-});
-/* shotPicked 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
-function shotPicked(src){
-  if(!src)return;
-  shotFile=src;
-  document.getElementById('faceReady').style.display='block';
-  document.getElementById('faceReady').innerHTML=
-    '<img id="facePrev" style="max-height:86px;border-radius:10px;border:1px solid var(--line)"><div style="font-size:12px;margin-top:4px">面部采集完成 ✅</div>';
-  document.getElementById('facePrev').src=shotFile;
-  document.getElementById('genBtn').disabled=false;
-}
-document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
-document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
-function genShot(){
-  document.getElementById('shotStage').classList.add('ready');
-  const c=document.getElementById('shotCanvas'),ctx=c.getContext('2d');
-  const s=SHOTS[shotStyle];
-  const stat=document.getElementById('shotStat');
-  /* 第一步：本机底图立即合成 */
-  shotLocal(ctx,stat,s,true);
-  toast('本机合成约 1 秒 · AI 云端高清创作约 15~40 秒，完成后自动替换');
-  /* 第二步：AI 云端场景，成功后自动替换（显示预计时间与已等待秒数） */
-  stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 正在排队调度算力（本机结果已合成，AI 完成后自动替换）';
-  const t0=Date.now();
-  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · '+aiStage(Math.round((Date.now()-t0)/1000))+'（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt='Chinese ancient style travel portrait scene background, '+s.bg+', Jinan China, traditional Chinese aesthetic architecture, soft golden lighting, atmospheric depth, cinematic color grading, scenic background only without people, empty foreground for portrait, '+FQ;
-  aiWithRetry(prompt,576,736,n=>{
-    stat.textContent='🔄 免费通道排队中，已自动第 '+(n+1)+' 次尝试（共 3 次）';
-  }).then(url=>{
-    const img=new Image();
-    img.onload=()=>{
-      clearInterval(tick);
-      /* AI 场景底图（576×736 高清全幅） */
-      drawCover(ctx,img,0,0,576,736);
-      /* 面部合成（羽化融合在 blendFace 内完成） */
-      const face=new Image();
-      face.onload=()=>{
-        /* 羽化融合人脸（市面 AI 换脸 App 同款手法：径向渐变蒙版，边缘自然过渡） */
-        blendFace(ctx,face,288,262,106);
-        shotShow(c);
-        stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
-        saveToAlbum(c,'城忆-AI旅拍-AI.png');
-      };
-      face.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ 照片合成失败，请返回重新采集照片'};
-      face.src=shotFile;
-    };
-    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已自动将本机合成结果存入相册';saveToAlbum(c,'城忆-AI旅拍.png')};
-    img.src=url;
-  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 通道重试 3 次后仍限流，已自动将本机合成结果存入相册，可稍后重试';saveToAlbum(c,'城忆-AI旅拍.png')});
-}
 /* 本机回退：剪影底图合成 */
-function shotLocal(ctx,stat,s,quiet){
-  const img=new Image();
-  img.onload=()=>{
-    ctx.save();ctx.scale(576/340,736/420); /* 576×736 高清画布，按 340×420 坐标系绘制 */
-    const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,s.sky[0]);g.addColorStop(1,s.sky[1]);
-    ctx.fillStyle=g;ctx.fillRect(0,0,340,420);
-    ctx.fillStyle='rgba(43,33,24,.28)';
-    ctx.fillRect(30,70,120,60); ctx.fillRect(215,90,95,45);
-    ctx.beginPath();ctx.moveTo(24,70);ctx.lineTo(90,36);ctx.lineTo(156,70);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(208,90);ctx.lineTo(262,60);ctx.lineTo(318,90);ctx.closePath();ctx.fill();
-    ctx.fillRect(255,30,16,60);
-    ctx.fillStyle='rgba(120,160,180,.4)';ctx.fillRect(0,300,340,28);
-    ctx.fillStyle='rgba(43,33,24,.16)';ctx.fillRect(0,328,340,92);
-    ctx.fillStyle=s.robe;
-    ctx.beginPath();ctx.moveTo(170,196);
-    ctx.bezierCurveTo(118,214,100,330,92,368);ctx.lineTo(248,368);
-    ctx.bezierCurveTo(240,330,222,214,170,196);ctx.closePath();ctx.fill();
-    ctx.strokeStyle=s.acc;ctx.lineWidth=3;ctx.stroke();
-    ctx.fillStyle=s.acc;
-    ctx.beginPath();ctx.moveTo(170,206);ctx.lineTo(142,244);ctx.lineTo(170,282);ctx.lineTo(198,244);ctx.closePath();ctx.fill();
-    ctx.save();ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.clip();
-    const sc=Math.max(116/img.width,116/img.height)*1.35;
-    ctx.drawImage(img,170-img.width*sc/2,148-img.height*sc/2,img.width*sc,img.height*sc);
-    ctx.restore();
-    ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.stroke();
-    ctx.restore();
-    shotShow(ctx.canvas);
-    if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机底图合成（稍后可重试）';
-  };
-  img.onerror=()=>{if(!quiet)stat.textContent='⚠️ 请先完成面部采集'};
-  img.src=shotFile;
-}
-function saveShot(share){
-  const a=acc();
-  a.shot=(a.shot||0)+1;a.ip=(a.ip||0)+1;
-  const src=document.getElementById('shotCanvas');
-  const tc=document.createElement('canvas');tc.width=150;tc.height=186;
-  tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,186);
-  const title='旅拍形象 #'+a.shot+' · '+SHOTS[shotStyle].n;
-  a.gallery=a.gallery||[];
-  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
-  if(a.gallery.length>12)a.gallery.pop();
-  saveDB();refreshMe();
-  saveToAlbum(src,'城忆-AI旅拍-'+a.shot+'.png');
-  toast(share?'已存入相册与旅拍册，并发布到共享作品墙':'已存入手机相册与旅拍册');
-  if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
-  resetShot();
-}
-function resetShot(){
-  shotFile=null; document.getElementById('sf').value=''; document.getElementById('su').value='';
-  document.getElementById('faceReady').style.display='none';
-  document.getElementById('faceReady').innerHTML='';
-  document.getElementById('shotStage').classList.remove('ready');
-  document.getElementById('shotArt').removeAttribute('src');
-  document.getElementById('genBtn').disabled=true;
-  toast('已重置，可重新选择风格与采集照片');
-}
+
+
+
 
 /* ---------- 推送开关 ---------- */
 function togglePush(){
