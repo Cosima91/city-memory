@@ -186,9 +186,7 @@
       <div class="card">
         <h2 class="sec" style="margin-top:0">打卡排行榜 · 积分累计</h2>
         <div style="font-size:12px;line-height:2">
-          <div>🥇 泉客·阿济　<b style="color:var(--red)">127</b> 枚印章　·　趵突泉×23</div>
-          <div>🥈 老城拾遗　<b style="color:var(--red)">96</b> 枚　·　曲水亭街×11</div>
-          <div>🥉 明湖青年　<b style="color:var(--red)">81</b> 枚</div>
+          <div class="muted" style="text-align:center;padding:10px 0">暂无上榜记录<br><b style="color:var(--red)">第一位上榜的，就是正在使用它的你</b></div>
           <div style="border-top:1px dashed var(--line);margin-top:4px;padding-top:4px">📍 你（游客）　<b id="myRank">0</b> 枚 · 打卡即可上榜</div>
         </div>
         <div class="muted mt8">在点位 500 米范围内可定位打卡，集印章兑文创（商城页）</div>
@@ -319,11 +317,9 @@
       </div>
       <h2 class="sec">时空来信 · 离馆后的长效运营</h2>
       <div class="card">
-        <div class="lesson"><div class="cover">💌</div><div><div class="t">你的分身在趵突泉看了一场日出</div><div class="d">「主人，今天三股水特别旺，我替你在泺源堂前拍了一张合影。」</div></div></div>
-        <div class="lesson"><div class="cover">🎭</div><div><div class="t">时空舞台 · 馆内大屏合影</div><div class="d">馆内互动大屏投放分身实时行走，扫码即可与自己的分身同框打卡</div></div></div>
-        <div class="lesson"><div class="cover">💬</div><div><div class="t">与分身文字 / 语音对话</div><div class="d">问它"曲水亭街的柳树几岁了"，它会用你上传的故事回答你</div></div></div>
-        <div class="muted mt8">机制参考文博场景「AI 旅拍 + 长效链接」：把单次打卡的线下流量，转化为长期活跃的线上数据资产——分身动态依托微信生态不定期推送。</div>
-        <button class="btn gold sm mt8" style="width:100%" onclick="toast('已开启推送（演示）：下次分身出游会第一时间告诉你')">🔔 开启分身动态推送</button>
+        <div class="muted" style="text-align:center;padding:8px 0">收件箱为空。<br>完成一次 <b style="color:var(--red)">AI 旅拍</b> 后，你的城市分身会不定期从老城发来明信片与动态——打卡流量由此转化为长期活跃的数据资产。</div>
+        <div class="muted mt8">机制参考文博场景「AI 旅拍 + 长效链接」：分身动态依托微信生态不定期推送。</div>
+        <button class="btn gold sm mt8" style="width:100%" onclick="toast('已开启推送（演示）：登录后，分身出游会第一时间告诉你')">🔔 开启分身动态推送</button>
       </div>
       <h2 class="sec">文化遗产科普课程 <span class="chip">会员专享</span></h2>
       <div class="card">
@@ -335,17 +331,7 @@
       </div>
       <h2 class="sec">审核后台（管理员）</h2>
       <div class="card">
-        <div class="adm"><b style="font-size:12px">投稿：市民张先生 · 「估衣市街的老门楼」照片</b><span class="st w">待审核</span>
-          <div class="muted">真实性核校 → 补充来源 → 采纳后积分 +20</div>
-          <div class="mt8"><button class="btn sm" onclick="toast('已通过并点亮（演示）')">通过</button> <button class="btn ghost sm" onclick="toast('已退回补充来源（演示）')">退回</button></div>
-        </div>
-        <div class="adm"><b style="font-size:12px">投稿：学生投稿 · 「黑虎泉兽头传说」口述文字</b><span class="st w">待审核</span>
-          <div class="mt8"><button class="btn sm" onclick="toast('已通过（演示）')">通过</button> <button class="btn ghost sm" onclick="toast('已退回（演示）')">退回</button></div>
-        </div>
-        <div class="adm"><b style="font-size:12px">讨论帖：「曲水亭街的柳树是哪年种的」</b><span class="st ok">已公开</span>
-          <div class="muted">标签：个人故事和记忆 · 浏览 312 · 回复 7</div>
-        </div>
-        <div class="adm"><b style="font-size:12px">资讯：讲座「明府城考古分享会」</b><span class="st ok">已发布</span></div>
+        <div class="muted" style="text-align:center;padding:10px 0">暂无待审内容。<br>用户投稿与资讯经 <b style="color:var(--red)">真实性核校 → 补充来源 → 采纳（积分 +20）</b> 后公开，审核队列随使用即时更新。</div>
       </div>
     </div>
   </div>
@@ -367,7 +353,7 @@
     <h3 id="dTitle">趵突泉</h3>
     <div id="dMeta" class="muted"></div>
     <div class="checkin" id="ckBox">
-      <div><b style="font-size:12.5px">📍 定位打卡</b><div class="muted" id="ckN">已有 4,286 人在此打卡</div></div>
+      <div><b style="font-size:12.5px">📍 定位打卡</b><div class="muted" id="ckN">还没有人打卡 · 你可以是第一个</div></div>
       <button class="btn sm" id="ckBtn" onclick="doCheck()">打卡+1</button>
     </div>
     <div style="font-size:12.5px;margin:8px 0 2px"><b>讨论区</b>（公开可见）· 选择类别发言：</div>
@@ -390,25 +376,13 @@
 <script>
 /* ---------- 数据 ---------- */
 const PTS=[
- {n:"趵突泉",c:1,era:"古代（金代立碑，天下第一泉）",ck:4286,
-  posts:[["老济南人","💭","小时候我爸带我来，说水旺的时候能看见三股水齐冒。那会儿不收票，就在栏杆边上看一下午。","个人故事和记忆"],
-         ["文保志愿者","📚","《历城县志》卷十六载：'泉源上奋，水涌若轮。'金代《名泉碑》列为七十二泉之首。","学术/档案资料"],
-         ["旅行日记","🧭","早7点前人少，出东门右转就是五龙潭，一条线逛完正好中午。","参观攻略"]]},
- {n:"大明湖·超然楼",c:2,era:"近代重建（2008年复建，元代旧址）",ck:9120,
-  posts:[["亮灯摄影","💭","等亮灯的那一分钟，全楼的人都在喊倒计时，挺感人的。","个人故事和记忆"],
-         ["建院学生","📚","楼体按元代张养浩《超然楼》诗意复建，铜贴金'江北第一楼'匾。","学术/档案资料"]]},
- {n:"黑虎泉",c:1,era:"古代（明代《历乘》有载）",ck:6703,
-  posts:[["打水大爷","💭","天天来打水，这泉水泡茶就是甜。虎头那边排队别挤，后面还有仨。","个人故事和记忆"]]},
- {n:"曲水亭街",c:2,era:"近代街区（明清格局延续）",ck:5311,
-  posts:[["街角咖啡","💭","家家泉水、户户垂杨，说的就是这儿。我店就开在王府池子边上。","个人故事和记忆"],
-         ["攻略组","🧭","连着百花洲、后宰门街一起逛，傍晚最好，灯笼亮了有老城味道。","参观攻略"]]},
- {n:"老济南站钟楼",c:2,era:"近代（1911年津浦铁路，1992年拆除，现存记忆地标）",ck:2104,
-  posts:[["城市记忆","💭","老站没了，可钟楼照片还在每家相册里。上传点位就是想让它别被忘掉。","个人故事和记忆"],
-         ["史地爱好者","📚","德式建筑，赫尔曼·菲舍尔设计。拆除争议本身是城市保护史的重要案例。","学术/档案资料"]]},
- {n:"市博物馆（原道院）",c:3,era:"近代建筑（1942年建成）",ck:1855,
-  posts:[["讲解员小刘","🧭","周二至周日9:00-17:00，免费，带身份证。一层济南历史展值得细看。","参观攻略"]]},
- {n:"洪家楼教堂",c:2,era:"近代（1901年，华北最大天主堂）",ck:3902,
-  posts:[["建院学生","📚","哥特式，洪楼deals双塔高约60米，用料为洪家楼当地石料。","学术/档案资料"]]},
+ {n:"趵突泉",c:1,era:"古代（金代立碑，天下第一泉）",ck:0,posts:[]},
+ {n:"大明湖·超然楼",c:2,era:"近代重建（2008年复建，元代旧址）",ck:0,posts:[]},
+ {n:"黑虎泉",c:1,era:"古代（明代《历乘》有载）",ck:0,posts:[]},
+ {n:"曲水亭街",c:2,era:"近代街区（明清格局延续）",ck:0,posts:[]},
+ {n:"老济南站钟楼",c:2,era:"近代（1911年津浦铁路，1992年拆除，现存记忆地标）",ck:0,posts:[]},
+ {n:"市博物馆（原道院）",c:3,era:"近代建筑（1942年建成）",ck:0,posts:[]},
+ {n:"洪家楼教堂",c:2,era:"近代（1901年，华北最大天主堂）",ck:0,posts:[]},
 ];
 /* 全国视图：34 省级区域 · 首都/省会/著名大城市 · 基础地标 */
 const NAT=[
@@ -451,7 +425,7 @@ let jnIdx=0;
 NAT.forEach((a,i)=>{
   PTS.push({n:a[0]+" · "+a[2],c:a[3]==="古代"?1:2,
     era:a[3]+" · 基础地标（内容由用户自行上传）",
-    ck:120+((i*977)%2800),basic:a,posts:[]});
+    ck:0,basic:a,posts:[]});
   if(a[0]==="济南")jnIdx=7+i;
 });
 document.getElementById('natMap').insertAdjacentHTML('beforeend',
@@ -484,7 +458,9 @@ function openDlg(i){
   if(i===jnIdx) metaHTML+=` <button class="btn sm gold" onclick="setView('jn');closeDlg();openDlg(0)">💧 进入济南试点详图</button>`;
   if(d.basic) metaHTML+=`<div class="muted mt8">该城市为<b>基础地标</b>点位：讨论内容、老照片、口述故事均由用户自行上传，经审核后公开。</div>`;
   document.getElementById('dMeta').innerHTML=metaHTML;
-  document.getElementById('ckN').textContent=`已有 ${d.ck.toLocaleString()} 人在此打卡`;
+  document.getElementById('ckN').textContent = d.ck===0
+    ? '还没有人打卡 · 你可以是第一个'
+    : `已有 ${d.ck.toLocaleString()} 人在此打卡`;
   document.getElementById('ckBtn').disabled=false; document.getElementById('ckBtn').textContent='打卡+1';
   renderPosts(); tagIdx=0; setTagBtns();
   document.getElementById('mask').style.display='block';
@@ -520,7 +496,9 @@ function sendMsg(){
 }
 function doCheck(){
   const d=PTS[cur]; d.ck++; userPts+=1;
-  document.getElementById('ckN').textContent=`已有 ${d.ck.toLocaleString()} 人在此打卡`;
+  document.getElementById('ckN').textContent = d.ck===1
+    ? '第一位打卡者就是你 🎉'
+    : `已有 ${d.ck.toLocaleString()} 人在此打卡`;
   const b=document.getElementById('ckBtn'); b.disabled=true; b.textContent='✓ 已打卡';
   document.getElementById('ptShow').textContent=userPts;
   const mr=document.getElementById('myRank'); if(mr)mr.textContent=userPts;
