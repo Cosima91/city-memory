@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.4.1</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.5</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -231,15 +231,17 @@
             <button data-f="xs">像素</button>
           </div>
           <button class="btn" style="width:100%" onclick="genIP()">✨ 开始生成</button>
+          <button class="btn ghost sm mt8" style="width:100%" onclick="resetIP()">🔄 更换图片（原照片已清除可重选）</button>
         </div>
         <div id="step3" style="display:none;text-align:center">
           <canvas id="ipCanvas" width="340" height="260"></canvas>
           <div id="ipStat" class="muted mt8">点击「开始生成」：本机 1 秒出图，AI 云端自动升级为创作插画</div>
           <div class="mt12" style="display:flex;gap:8px">
-            <button class="btn gold" style="flex:1" onclick="saveIP(0)">💾 存入我的库</button>
-            <button class="btn" style="flex:1" onclick="saveIP(1)">🏛️ 发布共享墙</button>
+            <button class="btn gold" style="flex:1" onclick="saveIP(0)">📲 存入相册</button>
+            <button class="btn" style="flex:1" onclick="saveIP(1)">🏛️ 相册+共享墙</button>
           </div>
-          <button class="btn ghost sm mt8" style="width:100%" onclick="resetIP()">再做一张</button>
+          <div class="muted mt8" style="font-size:11px">存入后原照片自动清除，可直接换一张重新生成</div>
+          <button class="btn ghost sm mt8" style="width:100%" onclick="resetIP()">换一张图重新生成</button>
         </div>
       </div>
       </div>
@@ -255,12 +257,8 @@
           </div>
           <div id="shot2" style="display:none;text-align:center">
             <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
-            <div style="display:flex;gap:8px">
-              <div class="drop" style="flex:1" onclick="document.getElementById('sf').click()">🤳 拍照采集<br><span style="font-size:10px">（调用前置摄像头）</span></div>
-              <div class="drop" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 上传正面照<br><span style="font-size:10px">（从相册选择，AI 合成）</span></div>
-            </div>
-            <input type="file" id="sf" accept="image/*" capture="user" hidden>
-            <input type="file" id="su" accept="image/*" hidden>
+            <div class="drop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或从相册选择<br><span style="font-size:10px">（与「点位 IP 创作」相同的选取方式）</span></div>
+            <input type="file" id="sf" accept="image/*" hidden>
             <div id="faceReady" style="display:none"></div>
             <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
           </div>
@@ -268,9 +266,10 @@
             <canvas id="shotCanvas" width="340" height="420" style="display:none;width:100%;border-radius:12px;border:1px solid var(--line)"></canvas>
             <div id="shotStat" class="muted mt8">点击「AI 实时合成」：本机立即合成，AI 云端场景随后自动升级</div>
             <div class="mt12" style="display:flex;gap:8px">
-              <button class="btn gold" style="flex:1" onclick="saveShot(0)">💾 存入旅拍册</button>
-              <button class="btn" style="flex:1" onclick="saveShot(1)">🏛️ 发布共享墙</button>
+              <button class="btn gold" style="flex:1" onclick="saveShot(0)">📲 存入相册</button>
+              <button class="btn" style="flex:1" onclick="saveShot(1)">🏛️ 相册+共享墙</button>
             </div>
+            <div class="muted mt8" style="font-size:11px">存入后采集的照片自动清除，可直接换一张重新合成</div>
             <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
             <button class="btn" style="width:100%;margin-top:8px" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
             <button class="btn ghost sm mt8" style="width:100%" onclick="resetShot()">再拍一张</button>
@@ -430,6 +429,15 @@
     微信用户一键登录
   </button>
   <button class="btn ghost sm mt8" style="width:100%" onclick="closeAuth()">先逛逛 · 游客模式</button>
+</div>
+
+<!-- 保存到手机相册（微信内长按保存） -->
+<div id="saveMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:130" onclick="closeSave()"></div>
+<div id="saveBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,88%);background:#fffdf8;border-radius:16px;padding:14px;z-index:131;box-shadow:0 18px 50px rgba(0,0,0,.35)">
+  <div style="font-weight:bold;margin-bottom:8px">📲 保存到手机相册</div>
+  <img id="saveImg" style="width:100%;border-radius:10px;border:1px solid var(--line)">
+  <div class="muted mt8" style="font-size:12px">微信内：<b>长按上方图片 → 保存图片</b>；其他浏览器已自动下载到本地。</div>
+  <button class="btn sm mt8" style="width:100%" onclick="closeSave()">完成</button>
 </div>
 
 <!-- 模拟系统短信通知 -->
@@ -852,12 +860,16 @@ function genIP(){
   const land=cur!=null?PTS[cur].n:'自定义点位';
   /* 第一步：本机立即合成（1 秒内出图，保证一定能生成） */
   ipLocal(ctx,c,stat,land,true);
-  /* 第二步：AI 云端创作，成功后自动替换 */
-  stat.textContent='✅ 本机已生成 · AI 云端创作中（最长 20 秒），完成后自动替换…';
+  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换');
+  /* 第二步：AI 云端创作，成功后自动替换（显示预计时间与已等待秒数） */
+  stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（本机结果已生成，AI 完成后自动替换）';
+  const t0=Date.now();
+  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
   const prompt='中国传统'+FN[curStyle]+'风格艺术插画：'+land+'，历史文化名城记忆主题，装饰性构图，博物馆文创海报质感，高清';
   aiImage(prompt,512,400).then(url=>{
     const img=new Image();
     img.onload=()=>{
+      clearInterval(tick);
       ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
       ctx.save();
       const r=36,w=300,h=200,x=(c.width-w)/2,y=22;
@@ -868,12 +880,12 @@ function genIP(){
       stampSeal(ctx,c.width,c.height);
       ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='left';
       ctx.fillText(land+' · '+FN[curStyle]+'风 · AI 创作',16,c.height-20);
-      stat.textContent='✅ 已升级为 AI 云端创作';
+      stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）';
       toast('AI 生成完成，已替换');
     };
-    img.onerror=()=>{stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
+    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
     img.src=url;
-  }).catch(()=>{stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
+  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
 }
 /* 本机回退：滤镜合成（AI 服务不可用时） */
 function ipLocal(ctx,c,stat,land,quiet){
@@ -908,10 +920,25 @@ function saveIP(share){
   a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
   if(a.gallery.length>12)a.gallery.pop();
   saveDB();refreshMe();
-  toast(share?'已存入 IP 库并发布到共享作品墙':'已存入我的 IP 库（本机保存），可在商城订制款使用');
+  /* 直接存入手机相册（微信内弹长按保存，浏览器内自动下载） */
+  saveToAlbum(src,'城忆-IP作品-'+a.ip+'.png');
+  toast(share?'已存入相册与我的 IP 库，并发布到共享作品墙':'已存入手机相册与我的 IP 库');
   if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
   resetIP();
 }
+/* 保存到手机相册：微信内长按保存；普通浏览器触发下载 */
+function saveToAlbum(cv,name){
+  let url;
+  try{url=cv.toDataURL('image/png')}catch(e){toast('保存失败：图片包含跨域资源');return}
+  document.getElementById('saveImg').src=url;
+  document.getElementById('saveMask').style.display='block';
+  document.getElementById('saveBox').style.display='block';
+  if(!/MicroMessenger/i.test(navigator.userAgent)){
+    const a=document.createElement('a');a.href=url;a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+  }
+}
+function closeSave(){document.getElementById('saveMask').style.display='none';document.getElementById('saveBox').style.display='none'}
 /* 共享作品墙：所有使用者可实时看到彼此发布的新作品 */
 function publishShared(d,t){
   DB.shared.unshift({id:Date.now()+Math.random().toString(36).slice(2,5),d:d,t:t,w:accName(),ts:Date.now()});
@@ -1003,7 +1030,6 @@ function shotPicked(f){
   document.getElementById('genBtn').disabled=false;
 }
 document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
-document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
 function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
 function genShot(){
   setStepT(3);
@@ -1013,12 +1039,16 @@ function genShot(){
   c.style.display='block';
   /* 第一步：本机底图立即合成 */
   shotLocal(ctx,stat,s,true);
-  /* 第二步：AI 云端场景，成功后自动替换 */
-  stat.textContent='✅ 本机已合成 · AI 云端创作「'+s.bg+'」场景中（最长 20 秒）…';
+  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换');
+  /* 第二步：AI 云端场景，成功后自动替换（显示预计时间与已等待秒数） */
+  stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 预计 10~20 秒（本机结果已合成，AI 完成后自动替换）';
+  const t0=Date.now();
+  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
   const prompt='中国传统古风场景插画：'+s.bg+'，'+s.n+'主题，人物画面前景留白构图，中国风水墨色调，高清横版';
   aiImage(prompt,480,600).then(url=>{
     const img=new Image();
     img.onload=()=>{
+      clearInterval(tick);
       /* AI 场景底图 */
       drawCover(ctx,img,0,0,340,420);
       /* 面部合成（用户照片圆形贴合，本机处理） */
@@ -1038,15 +1068,15 @@ function genShot(){
         ctx.fillText(s.n+' · '+s.bg,170,390);
         ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
         ctx.fillText('城忆 AI 旅拍 · AI 云端场景 × 你的照片',170,408);
-        stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片';
+        stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）';
         toast('AI 合成完成，已替换');
       };
-      face.onerror=()=>{stat.textContent='⚠️ 照片合成失败，请返回重新采集照片'};
+      face.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ 照片合成失败，请返回重新采集照片'};
       face.src=shotFile;
     };
-    img.onerror=()=>{stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
+    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
     img.src=url;
-  }).catch(()=>{stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
+  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
 }
 /* 本机回退：剪影底图合成 */
 function shotLocal(ctx,stat,s,quiet){
@@ -1095,12 +1125,13 @@ function saveShot(share){
   a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
   if(a.gallery.length>12)a.gallery.pop();
   saveDB();refreshMe();
-  toast(share?'已存入旅拍册并发布到共享作品墙':'已存入旅拍册（本机保存），可打印实体照片或订制文创');
+  saveToAlbum(src,'城忆-AI旅拍-'+a.shot+'.png');
+  toast(share?'已存入相册与旅拍册，并发布到共享作品墙':'已存入手机相册与旅拍册');
   if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
   resetShot();
 }
 function resetShot(){
-  shotFile=null; document.getElementById('sf').value=''; document.getElementById('su').value='';
+  shotFile=null; document.getElementById('sf').value='';
   document.getElementById('faceReady').style.display='none';
   document.getElementById('shotCanvas').style.display='none';
   document.getElementById('shot3').style.display='none';
