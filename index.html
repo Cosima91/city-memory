@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.5</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.6</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -218,7 +218,11 @@
       </div>
       <div class="card">
         <div id="step1">
-          <div class="drop" onclick="document.getElementById('f').click()">📷 点击上传点位照片<br><span style="font-size:10px">（可用任意图片 · 图像仅在本机处理，不上传）</span></div>
+          <div style="display:flex;gap:8px">
+            <div class="drop" style="flex:1" onclick="document.getElementById('fc').click()">📷 拍照采集<br><span style="font-size:10px">（调用相机拍摄）</span></div>
+            <div class="drop" style="flex:1" onclick="document.getElementById('f').click()">🖼️ 从相册选择<br><span style="font-size:10px">（上传已有照片）</span></div>
+          </div>
+          <input type="file" id="fc" accept="image/*" capture="user" hidden>
           <input type="file" id="f" accept="image/*" hidden>
           <div class="muted mt8">支持：点位建筑照 / 老照片 / 手绘草图。上传即视为同意《二创授权协议》。</div>
         </div>
@@ -235,7 +239,7 @@
         </div>
         <div id="step3" style="display:none;text-align:center">
           <canvas id="ipCanvas" width="340" height="260"></canvas>
-          <div id="ipStat" class="muted mt8">点击「开始生成」：本机 1 秒出图，AI 云端自动升级为创作插画</div>
+          <div id="ipStat" class="muted mt8">点击「开始生成」：1 秒出风格化作品，AI 云端完成后自动替换并存入相册</div>
           <div class="mt12" style="display:flex;gap:8px">
             <button class="btn gold" style="flex:1" onclick="saveIP(0)">📲 存入相册</button>
             <button class="btn" style="flex:1" onclick="saveIP(1)">🏛️ 相册+共享墙</button>
@@ -257,8 +261,12 @@
           </div>
           <div id="shot2" style="display:none;text-align:center">
             <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
-            <div class="drop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或从相册选择<br><span style="font-size:10px">（与「点位 IP 创作」相同的选取方式）</span></div>
-            <input type="file" id="sf" accept="image/*" hidden>
+            <div style="display:flex;gap:8px">
+              <div class="drop" style="flex:1" onclick="document.getElementById('sf').click()">🤳 相机拍照采集<br><span style="font-size:10px">（调用相机拍摄）</span></div>
+              <div class="drop" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 从相册选择<br><span style="font-size:10px">（上传正面照）</span></div>
+            </div>
+            <input type="file" id="sf" accept="image/*" capture="user" hidden>
+            <input type="file" id="su" accept="image/*" hidden>
             <div id="faceReady" style="display:none"></div>
             <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
           </div>
@@ -817,14 +825,16 @@ const FL={gq:'saturate(1.7) contrast(1.15) hue-rotate(-8deg)',sm:'grayscale(1) c
 const FN={gq:'国潮插画',sm:'水墨',jf:'剪纸',xs:'像素'};
 let curFile=null, curStyle='gq', ipCount=0;
 const fi=document.getElementById('f');
-fi.addEventListener('change',e=>{
-  const file=e.target.files[0]; if(!file)return;
+function ipPick(file){
+  if(!file)return;
   curFile=URL.createObjectURL(file);
   document.getElementById('srcImg').src=curFile;
   document.getElementById('step1').style.display='none';
   document.getElementById('step2').style.display='block';
   setStep(2);
-});
+}
+fi.addEventListener('change',e=>ipPick(e.target.files[0]));
+document.getElementById('fc').addEventListener('change',e=>ipPick(e.target.files[0]));
 document.querySelectorAll('.styles button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.styles button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); curStyle=b.dataset.f;
@@ -852,20 +862,54 @@ function stampSeal(ctx,cw,ch){
   ctx.fillStyle='#fff';ctx.font='bold 15px serif';ctx.textAlign='center';
   ctx.fillText('城忆',cw-52,ch-50);ctx.fillText('监制',cw-52,ch-33);
 }
+/* 像素级风格化（纯 JS 实现，iOS/Safari 全兼容，不依赖 ctx.filter） */
+function pixStyle(cv,style){
+  const cx=cv.getContext('2d'),d=cx.getImageData(0,0,cv.width,cv.height),p=d.data;
+  for(let i=0;i<p.length;i+=4){
+    let r=p[i],g=p[i+1],b=p[i+2];const avg=(r+g+b)/3;
+    if(style==='gq'){ /* 国潮：高饱和 + 暖金色调 */
+      r=Math.max(0,Math.min(255,avg+(r-avg)*2.0+16));
+      g=Math.max(0,Math.min(255,avg+(g-avg)*1.75+4));
+      b=Math.max(0,Math.min(255,avg+(b-avg)*1.5-10));
+    }else if(style==='sm'){ /* 水墨：黑白高对比 */
+      const v=Math.max(0,Math.min(255,(r*0.3+g*0.59+b*0.11-128)*1.55+142));
+      r=g=b=v;
+    }else if(style==='jf'){ /* 剪纸：红/黑/宣纸三色量化 */
+      const lum=r*0.3+g*0.59+b*0.11;
+      if(lum>168){r=247;g=239;b=223}
+      else if(lum>92){r=178;g=56;b=44}
+      else{r=43;g=33;b=24}
+    }else{ /* 像素（xs）：高饱和锐化，配合缩小放大 */
+      r=Math.max(0,Math.min(255,avg+(r-avg)*1.6));
+      g=Math.max(0,Math.min(255,avg+(g-avg)*1.6));
+      b=Math.max(0,Math.min(255,avg+(b-avg)*1.6));
+    }
+    p[i]=r;p[i+1]=g;p[i+2]=b;
+  }
+  cx.putImageData(d,0,0);
+}
+/* 像素风专属：缩小 9 倍再最近邻放大，产生马赛克块 */
+function pixBlock(off,w,h){
+  const sm=document.createElement('canvas');sm.width=Math.max(4,Math.round(w/9));sm.height=Math.max(4,Math.round(h/9));
+  const sctx=sm.getContext('2d');sctx.drawImage(off,0,0,sm.width,sm.height);
+  const octx=off.getContext('2d');octx.imageSmoothingEnabled=false;
+  octx.clearRect(0,0,w,h);octx.drawImage(sm,0,0,sm.width,sm.height,0,0,w,h);
+  octx.imageSmoothingEnabled=true;
+}
 function genIP(){
   setStep(3);
   const c=document.getElementById('ipCanvas'),ctx=c.getContext('2d');
   const stat=document.getElementById('ipStat');
   c.style.display='block';
   const land=cur!=null?PTS[cur].n:'自定义点位';
-  /* 第一步：本机立即合成（1 秒内出图，保证一定能生成） */
+  /* 第一步：本机像素级风格化（1 秒内出图，与原图明显不同） */
   ipLocal(ctx,c,stat,land,true);
-  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换');
-  /* 第二步：AI 云端创作，成功后自动替换（显示预计时间与已等待秒数） */
+  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换并存相册');
+  /* 第二步：AI 云端创作，成功后自动替换并自动存相册 */
   stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（本机结果已生成，AI 完成后自动替换）';
   const t0=Date.now();
   const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt='中国传统'+FN[curStyle]+'风格艺术插画：'+land+'，历史文化名城记忆主题，装饰性构图，博物馆文创海报质感，高清';
+  const prompt='中国传统'+FN[curStyle]+'风格艺术插画海报：'+land+'，大幅艺术化重构，非照片写实，图案化装饰构图，鲜明笔触与色块，博物馆文创质感';
   aiImage(prompt,512,400).then(url=>{
     const img=new Image();
     img.onload=()=>{
@@ -880,30 +924,38 @@ function genIP(){
       stampSeal(ctx,c.width,c.height);
       ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='left';
       ctx.fillText(land+' · '+FN[curStyle]+'风 · AI 创作',16,c.height-20);
-      stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）';
-      toast('AI 生成完成，已替换');
+      stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
+      saveToAlbum(c,'城忆-IP作品-AI.png');
     };
-    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
+    img.onerror=()=>{clearInterval(tick);autoSaveLocal(c,stat,'AI 结果加载失败')};
     img.src=url;
-  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
+  }).catch(()=>{clearInterval(tick);autoSaveLocal(c,stat,'AI 免费通道限流')});
 }
-/* 本机回退：滤镜合成（AI 服务不可用时） */
+/* AI 不可用时：自动把本机像素风格化结果存入相册 */
+function autoSaveLocal(c,stat,why){
+  stat.textContent='⚠️ '+why+'，已自动将本机风格化结果存入相册（可稍后重试 AI）';
+  saveToAlbum(c,'城忆-IP作品.png');
+}
+/* 本机回退：像素级风格化合成（与原图明显不同，iOS 全兼容） */
 function ipLocal(ctx,c,stat,land,quiet){
   const img=new Image();
   img.onload=()=>{
+    const w=240,h=180;
+    const off=document.createElement('canvas');off.width=w;off.height=h;
+    const octx=off.getContext('2d');
+    drawCover(octx,img,0,0,w,h);
+    if(curStyle==='xs')pixBlock(off,w,h);
+    pixStyle(off,curStyle);
     ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
-    ctx.save();
-    if(FILTER_OK)ctx.filter=FL[curStyle];
-    const r=36, w=240,h=180, x=(c.width-w)/2,y=26;
-    ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.clip();
-    drawCover(ctx,img,x,y,w,h);
+    const r=36,x=(c.width-w)/2,y=26;
+    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.clip();
+    ctx.drawImage(off,x,y);
     ctx.restore();
-    ctx.filter='none';
     ctx.strokeStyle='#b03a2e'; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke();
     stampSeal(ctx,c.width,c.height);
     ctx.fillStyle='#2b2118'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
     ctx.fillText(land+' · '+FN[curStyle]+'风', 16, c.height-24);
-    if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机滤镜合成（稍后可重试 AI 生成）';
+    if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机风格化合成（稍后可重试 AI 生成）';
   };
   img.onerror=()=>{if(!quiet)stat.textContent='⚠️ 请先在上传步骤选择照片'};
   img.src=curFile;
@@ -988,7 +1040,7 @@ document.getElementById('swIn').addEventListener('change',e=>{
   });
 });
 function resetIP(){
-  curFile=null; document.getElementById('f').value='';
+  curFile=null; document.getElementById('f').value=''; document.getElementById('fc').value='';
   document.getElementById('ipCanvas').style.display='none';
   document.getElementById('step3').style.display='none';
   document.getElementById('step2').style.display='none';
@@ -1030,6 +1082,7 @@ function shotPicked(f){
   document.getElementById('genBtn').disabled=false;
 }
 document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
+document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
 function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
 function genShot(){
   setStepT(3);
@@ -1068,15 +1121,15 @@ function genShot(){
         ctx.fillText(s.n+' · '+s.bg,170,390);
         ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
         ctx.fillText('城忆 AI 旅拍 · AI 云端场景 × 你的照片',170,408);
-        stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）';
-        toast('AI 合成完成，已替换');
+        stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
+        saveToAlbum(c,'城忆-AI旅拍-AI.png');
       };
       face.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ 照片合成失败，请返回重新采集照片'};
       face.src=shotFile;
     };
-    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已保留本机合成结果'};
+    img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已自动将本机合成结果存入相册';saveToAlbum(c,'城忆-AI旅拍.png')};
     img.src=url;
-  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道暂不可用（限流中，每 45 秒 1 张），已保留本机合成结果，可稍后重试'});
+  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道限流（每 45 秒 1 张），已自动将本机合成结果存入相册，可稍后重试';saveToAlbum(c,'城忆-AI旅拍.png')});
 }
 /* 本机回退：剪影底图合成 */
 function shotLocal(ctx,stat,s,quiet){
@@ -1131,7 +1184,7 @@ function saveShot(share){
   resetShot();
 }
 function resetShot(){
-  shotFile=null; document.getElementById('sf').value='';
+  shotFile=null; document.getElementById('sf').value=''; document.getElementById('su').value='';
   document.getElementById('faceReady').style.display='none';
   document.getElementById('shotCanvas').style.display='none';
   document.getElementById('shot3').style.display='none';
