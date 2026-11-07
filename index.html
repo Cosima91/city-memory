@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.2</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.3</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -288,8 +288,10 @@
       </div>
       <div class="card">
         <h2 class="sec" style="margin-top:0">🏛️ 共享作品墙（<span id="sharedN">0</span>）</h2>
-        <div id="sharedList" class="goods"></div>
-        <div class="muted mt8" style="font-size:11px">所有使用者的新作可实时共享到这面墙（同设备多用户即时同步；接入云端后全网共享）。管理员可在后台下架。</div>
+        <div class="drop" onclick="swUpload()">📷 上传照片到共享墙（可一次选多张）<br><span style="font-size:10px">支持批量选择 · 发布后可随时撤回</span></div>
+        <input type="file" id="swIn" accept="image/*" multiple hidden>
+        <div id="sharedList" class="goods mt8"></div>
+        <div class="muted mt8" style="font-size:11px">所有使用者的新作可实时共享到这面墙（同设备多用户即时同步；接入云端后全网共享）。作者可撤回，管理员可下架。</div>
       </div>
     </div>
 
@@ -639,13 +641,21 @@ function renderGallery(){
   const il=document.getElementById('ipList');
   if(a.gallery&&a.gallery.length){
     gc.style.display='block';
-    gl.innerHTML=a.gallery.map(g=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div></div>`).join('');
-    il.innerHTML=a.gallery.map(g=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div><button class="btn sm gold mt8" style="width:100%" onclick="toast('已加入订制清单，下单见商城（支付通道接入中）')">去订制文创</button></div>`).join('');
+    gl.innerHTML=a.gallery.map((g,i)=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div><button class="btn ghost sm mt8" style="width:100%" onclick="delGallery(${i})">↩️ 撤回该作品</button></div>`).join('');
+    il.innerHTML=a.gallery.map((g,i)=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div><button class="btn sm gold mt8" style="width:100%" onclick="toast('已加入订制清单，下单见商城（支付通道接入中）')">去订制文创</button><button class="btn ghost sm mt8" style="width:100%" onclick="delGallery(${i})">↩️ 撤回</button></div>`).join('');
   }else{
     gc.style.display='none';
     il.innerHTML='<div class="muted">还没有作品，去生成第一个吧</div>';
   }
   document.getElementById('ipN').textContent=a.ip;
+}
+/* 撤回作品：从我的作品库移除（确认后执行） */
+function delGallery(i){
+  if(!confirm('确定撤回这件作品吗？撤回后将从作品库移除。'))return;
+  const a=acc();
+  a.gallery.splice(i,1);
+  saveDB();refreshMe();
+  toast('作品已撤回');
 }
 function renderAdm(){
   document.getElementById('admGuestTip').style.display='none';
@@ -828,16 +838,44 @@ function delShared(id){
   DB.shared=DB.shared.filter(x=>x.id!==id);
   saveDB();renderShared();
   if(DB.me&&DB.me===DB.admin)renderAdm();
-  toast('该共享作品已下架');
+  toast('作品已从共享墙撤回');
 }
 function renderShared(){
   const box=document.getElementById('sharedList');if(!box)return;
   document.getElementById('sharedN').textContent=(DB.shared||[]).length;
   const adm=DB.me&&DB.me===DB.admin;
   box.innerHTML=(DB.shared||[]).length
-    ? DB.shared.map(x=>`<div class="g" style="padding:6px"><img src="${x.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(x.t)}</div><div class="muted" style="font-size:10px">作者：${esc(x.w)}</div>${adm?`<button class="btn ghost sm mt8" style="width:100%" onclick="delShared('${x.id}')">下架</button>`:''}</div>`).join('')
+    ? DB.shared.map(x=>{
+        const mine=DB.me&&x.w===accName();
+        const act=adm?(mine?'<button class="btn ghost sm mt8" style="width:100%" onclick="delShared(\''+x.id+'\')">下架（含自己作品）</button>':'<button class="btn ghost sm mt8" style="width:100%" onclick="delShared(\''+x.id+'\')">下架</button>')
+                 :(mine?'<button class="btn ghost sm mt8" style="width:100%" onclick="delShared(\''+x.id+'\')">↩️ 撤回</button>':'');
+        return `<div class="g" style="padding:6px"><img src="${x.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(x.t)}</div><div class="muted" style="font-size:10px">作者：${esc(x.w)} · ${new Date(x.ts).getMonth()+1}/${new Date(x.ts).getDate()}</div>${act}</div>`;
+      }).join('')
     : '<div class="muted">还没有人发布，第一个发布的就是封面</div>';
 }
+/* 共享墙批量上传：一次可选多张照片，逐张压缩后发布 */
+function swUpload(){
+  if(!DB.me){toast('请先登录后再发布到共享墙');openAuth();return}
+  document.getElementById('swIn').click();
+}
+document.getElementById('swIn').addEventListener('change',e=>{
+  const fs=[...e.target.files];e.target.value='';
+  if(!fs.length)return;
+  let done=0;
+  fs.forEach(f=>{
+    const img=new Image();
+    img.onload=()=>{
+      const c=document.createElement('canvas');
+      const s=Math.min(340/img.width,340/img.height,1);
+      c.width=Math.max(1,Math.round(img.width*s));c.height=Math.max(1,Math.round(img.height*s));
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      publishShared(c.toDataURL('image/jpeg',0.6),'随手拍 · '+(cur!=null&&PTS[cur]?PTS[cur].n:'城市记忆'));
+      if(++done===fs.length)toast('已发布 '+fs.length+' 张照片到共享作品墙，可随时撤回');
+    };
+    img.onerror=()=>{if(++done===fs.length)toast('已发布 '+done+' 张（部分照片读取失败）')};
+    img.src=URL.createObjectURL(f);
+  });
+});
 function resetIP(){
   curFile=null; document.getElementById('f').value='';
   document.getElementById('ipCanvas').style.display='none';
