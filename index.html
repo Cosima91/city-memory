@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.0</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.2</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -241,9 +241,10 @@
           <canvas id="ipCanvas" width="340" height="260"></canvas>
           <div class="muted mt8">已生成你的专属点位 IP（滤镜合成，正式版将接入 AIGC 模型）</div>
           <div class="mt12" style="display:flex;gap:8px">
-            <button class="btn gold" style="flex:1" onclick="saveIP()">💾 存入我的 IP 库</button>
-            <button class="btn ghost" style="flex:1" onclick="resetIP()">再做一张</button>
+            <button class="btn gold" style="flex:1" onclick="saveIP(0)">💾 存入我的库</button>
+            <button class="btn" style="flex:1" onclick="saveIP(1)">🏛️ 发布共享墙</button>
           </div>
+          <button class="btn ghost sm mt8" style="width:100%" onclick="resetIP()">再做一张</button>
         </div>
       </div>
       </div>
@@ -259,18 +260,24 @@
           </div>
           <div id="shot2" style="display:none;text-align:center">
             <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
-            <div class="drop" id="faceDrop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或上传正面照<br><span style="font-size:10px">（图像仅在本机处理，不上传）</span></div>
+            <div style="display:flex;gap:8px">
+              <div class="drop" style="flex:1" onclick="document.getElementById('sf').click()">🤳 拍照采集<br><span style="font-size:10px">（调用前置摄像头）</span></div>
+              <div class="drop" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 上传正面照<br><span style="font-size:10px">（从相册选择，AI 合成）</span></div>
+            </div>
             <input type="file" id="sf" accept="image/*" capture="user" hidden>
+            <input type="file" id="su" accept="image/*" hidden>
+            <div id="faceReady" style="display:none"></div>
             <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
           </div>
           <div id="shot3" style="display:none;text-align:center">
             <canvas id="shotCanvas" width="340" height="420" style="display:none;width:100%;border-radius:12px;border:1px solid var(--line)"></canvas>
             <div class="muted mt8">已合成你的城市装扮形象（正式版将接入人脸融合模型）</div>
             <div class="mt12" style="display:flex;gap:8px">
-              <button class="btn gold" style="flex:1" onclick="saveShot()">💾 存入旅拍册</button>
-              <button class="btn" style="flex:1" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
+              <button class="btn gold" style="flex:1" onclick="saveShot(0)">💾 存入旅拍册</button>
+              <button class="btn" style="flex:1" onclick="saveShot(1)">🏛️ 发布共享墙</button>
             </div>
             <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
+            <button class="btn" style="width:100%;margin-top:8px" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
             <button class="btn ghost sm mt8" style="width:100%" onclick="resetShot()">再拍一张</button>
           </div>
         </div>
@@ -278,6 +285,11 @@
       <div class="card">
         <h2 class="sec" style="margin-top:0">我的 IP 库（<span id="ipN">0</span>）</h2>
         <div id="ipList" class="goods"><div class="muted">还没有作品，去生成第一个吧</div></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin-top:0">🏛️ 共享作品墙（<span id="sharedN">0</span>）</h2>
+        <div id="sharedList" class="goods"></div>
+        <div class="muted mt8" style="font-size:11px">所有使用者的新作可实时共享到这面墙（同设备多用户即时同步；接入云端后全网共享）。管理员可在后台下架。</div>
       </div>
     </div>
 
@@ -379,24 +391,67 @@
 
 <!-- 登录 / 注册 -->
 <div id="authMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:98" onclick="closeAuth()"></div>
-<div id="authBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:290px;background:#fffdf8;border-radius:16px;padding:18px;z-index:99;box-shadow:0 18px 50px rgba(0,0,0,.25)">
-  <h3 style="margin:0 0 10px">城忆账号</h3>
+<div id="authBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;background:#fffdf8;border-radius:16px;padding:18px;z-index:99;box-shadow:0 18px 50px rgba(0,0,0,.25)">
+  <h3 style="margin:0 0 4px">城忆账号</h3>
+  <div class="muted" style="font-size:11px;margin-bottom:12px">首次登录将自动注册，游客数据自动并入</div>
   <div style="display:flex;gap:8px;margin-bottom:12px">
-    <button id="tabL" class="btn sm" onclick="switchAuth('login')">登录</button>
-    <button id="tabR" class="btn ghost sm" onclick="switchAuth('reg')">注册</button>
+    <button id="tabL" class="btn sm" onclick="switchAuth('sms')">验证码登录</button>
+    <button id="tabR" class="btn ghost sm" onclick="switchAuth('pwd')">密码登录</button>
   </div>
-  <div id="authLogin">
-    <input id="logN" placeholder="昵称" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;box-sizing:border-box;font-size:13px">
-    <input id="logP" type="password" placeholder="密码" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
-    <button class="btn" style="width:100%;margin-top:10px" onclick="doLogin()">登录</button>
+  <!-- 手机号 + 验证码（新用户自动注册） -->
+  <div id="authSms">
+    <div style="display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;background:#fff">
+      <span style="padding:0 10px;font-size:13px;color:#6b5d4f;border-right:1px solid var(--line)">+86</span>
+      <input id="smsPhone" type="tel" maxlength="11" placeholder="手机号" style="flex:1;padding:9px 12px;border:none;outline:none;font-size:13px;box-sizing:border-box">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input id="smsCode" type="tel" maxlength="6" placeholder="验证码" style="flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
+      <button id="smsBtn" class="btn ghost sm" style="white-space:nowrap" onclick="sendSms()">获取验证码</button>
+    </div>
+    <input id="smsPwd" type="password" placeholder="设置密码（可选，至少 6 位，用于密码登录）" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
+    <button class="btn gold" style="width:100%;margin-top:10px" onclick="doSmsGo()">登录 / 注册</button>
+    <div class="muted mt8" style="font-size:11px">未注册的手机号验证通过后将自动创建账号，第一个注册的账号自动成为管理员。</div>
   </div>
-  <div id="authReg" style="display:none">
-    <input id="regN" placeholder="昵称（将显示在你的帖子旁）" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;box-sizing:border-box;font-size:13px">
-    <input id="regP" type="password" placeholder="设置密码（至少 4 位）" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
-    <button class="btn gold" style="width:100%;margin-top:10px" onclick="doReg()">注册并登录</button>
-    <div class="muted mt8" style="font-size:11px">游客期间打卡、发帖攒的数据会自动并入新账号；第一个注册的账号自动成为管理员。</div>
+  <!-- 手机号 + 密码 -->
+  <div id="authPwd" style="display:none">
+    <div style="display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;background:#fff">
+      <span style="padding:0 10px;font-size:13px;color:#6b5d4f;border-right:1px solid var(--line)">+86</span>
+      <input id="pwdPhone" type="tel" maxlength="11" placeholder="手机号" style="flex:1;padding:9px 12px;border:none;outline:none;font-size:13px;box-sizing:border-box">
+    </div>
+    <input id="pwdPass" type="password" placeholder="密码" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
+    <button class="btn" style="width:100%;margin-top:10px" onclick="doPwdLogin()">登录</button>
+    <div class="muted mt8" style="font-size:11px">首次使用请先在「验证码登录」中完成注册并设置密码。</div>
   </div>
+  <!-- 第三方登录 -->
+  <div style="display:flex;align-items:center;gap:10px;margin:16px 0 10px">
+    <div style="flex:1;height:1px;background:var(--line)"></div>
+    <span class="muted" style="font-size:11px">其他登录方式</span>
+    <div style="flex:1;height:1px;background:var(--line)"></div>
+  </div>
+  <button style="width:100%;padding:10px 0;border:1px solid #dcdcdc;border-radius:12px;background:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="wxLogin()">
+    <span style="width:22px;height:22px;border-radius:6px;background:#09bb07;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold">微</span>
+    微信用户一键登录
+  </button>
   <button class="btn ghost sm mt8" style="width:100%" onclick="closeAuth()">先逛逛 · 游客模式</button>
+</div>
+
+<!-- 模拟系统短信通知 -->
+<div id="smsBanner" style="display:none;position:fixed;left:50%;top:16px;transform:translateX(-50%);width:min(340px,92%);background:#fff;border-radius:14px;z-index:120;box-shadow:0 12px 36px rgba(0,0,0,.3);overflow:hidden">
+  <div style="background:#f2f2f2;padding:7px 14px;font-size:12px;color:#666;display:flex;justify-content:space-between"><span>短信 · 10690</span><span>现在</span></div>
+  <div style="padding:12px 14px;font-size:13px;line-height:1.6;color:#111">【城忆】您的验证码为 <b id="smsBannerCode" style="color:#9c2b23;font-size:16px;letter-spacing:1px"></b>，10 分钟内有效。请勿泄露给他人。</div>
+</div>
+
+<!-- 微信授权确认 -->
+<div id="wxMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:120"></div>
+<div id="wxBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;background:#f7f7f7;border-radius:16px;z-index:121;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.3)">
+  <div style="background:#ededed;padding:11px 14px;text-align:center;font-size:14px;color:#111">微信授权</div>
+  <div style="padding:22px 20px;text-align:center">
+    <div style="width:52px;height:52px;margin:0 auto 8px;border-radius:12px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold">忆</div>
+    <div style="font-size:14px;color:#111;margin-bottom:2px">城忆</div>
+    <div class="muted" style="font-size:12px;margin-bottom:16px">申请获取你的昵称等公开信息</div>
+    <button style="width:100%;padding:10px 0;border:none;border-radius:10px;background:#09bb07;color:#fff;font-size:14px" onclick="wxConfirm()">允许</button>
+    <button style="width:100%;padding:10px 0;margin-top:8px;border:none;background:transparent;font-size:13px;color:#888" onclick="wxCancel()">拒绝</button>
+  </div>
 </div>
 
 <div id="toast" style="position:fixed;left:50%;top:12%;transform:translateX(-50%);background:#2b2118;color:#fff;
@@ -469,50 +524,110 @@ let cur=null, tagIdx=0, userPts=0;
    ===================================================== */
 const DBK='chengyi_db_v1';
 let DB;try{DB=JSON.parse(localStorage.getItem(DBK))}catch(e){}
-if(!DB||typeof DB!=='object'||!DB.users)DB={users:{},me:null,guest:{pts:0,ip:0,shot:0,posts:0,cks:{}},ck:{},posts:{},admin:null};
+if(!DB||typeof DB!=='object'||!DB.users)DB={users:{},me:null,guest:{pts:0,ip:0,shot:0,posts:0,cks:{}},ck:{},posts:{},admin:null,wxId:null,shared:[]};
+if(!DB.shared)DB.shared=[];
 function saveDB(){try{localStorage.setItem(DBK,JSON.stringify(DB))}catch(e){toast('本地存储空间不足，最近一次保存失败')}}
 function acc(){return DB.me?DB.users[DB.me]:DB.guest}
-function accName(){return DB.me||'游客'}
+function accName(){if(!DB.me)return'游客';const u=DB.users[DB.me];return (u&&u.nick)||DB.me}
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return 'h'+h}
 function esc(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
 /* 恢复打卡数与讨论内容 */
 PTS.forEach((p,i)=>{p.ck=DB.ck[i]||0;p.posts=DB.posts[i]||[]});
+/* 共享作品墙：同机多标签页 / 多用户实时同步（storage 事件驱动） */
+window.addEventListener('storage',e=>{
+  if(e.key!==DBK||!e.newValue)return;
+  try{DB=JSON.parse(e.newValue)}catch(err){return}
+  PTS.forEach((p,i)=>{p.ck=DB.ck[i]||0;p.posts=DB.posts[i]||[]});
+  refreshMe();renderShared();
+});
 
-/* ---------- 账号：注册 / 登录 / 退出 ---------- */
-function openAuth(){document.getElementById('authMask').style.display='block';document.getElementById('authBox').style.display='block';switchAuth('login')}
+/* ---------- 账号：手机号验证码注册 / 密码登录 / 微信登录 ---------- */
+function openAuth(){document.getElementById('authMask').style.display='block';document.getElementById('authBox').style.display='block';switchAuth('sms')}
 function closeAuth(){document.getElementById('authMask').style.display='none';document.getElementById('authBox').style.display='none'}
 function switchAuth(t){
-  document.getElementById('authLogin').style.display=t==='login'?'block':'none';
-  document.getElementById('authReg').style.display=t==='reg'?'block':'none';
-  document.getElementById('tabL').className=t==='login'?'btn sm':'btn ghost sm';
-  document.getElementById('tabR').className=t==='reg'?'btn sm':'btn ghost sm';
+  document.getElementById('authSms').style.display=t==='sms'?'block':'none';
+  document.getElementById('authPwd').style.display=t==='pwd'?'block':'none';
+  document.getElementById('tabL').className=t==='sms'?'btn sm':'btn ghost sm';
+  document.getElementById('tabR').className=t==='pwd'?'btn sm':'btn ghost sm';
 }
-function doReg(){
-  const n=document.getElementById('regN').value.trim(),p=document.getElementById('regP').value;
-  if(!n||p.length<4){toast('请填写昵称，密码至少 4 位');return}
-  if(DB.users[n]){toast('该昵称已被注册，请换一个');return}
-  DB.users[n]={pass:hash(p),pts:0,ip:0,shot:0,posts:0,cks:{},ts:Date.now()};
-  if(!DB.admin)DB.admin=n;
+const P_RE=/^1[3-9]\d{9}$/;
+let sms=null,smsT=null;
+function phoneErr(v){if(!P_RE.test(v))return'请输入正确的 11 位手机号';return null}
+function newAccount(id,nick,pass){
+  DB.users[id]={nick:nick,pass:pass||null,pts:0,ip:0,shot:0,posts:0,cks:{},ts:Date.now()};
+  if(!DB.admin)DB.admin=id;
   /* 迁移游客期间积累的数据 */
   const g=DB.guest;
-  DB.users[n].pts+=g.pts;DB.users[n].ip+=g.ip;DB.users[n].shot+=g.shot;DB.users[n].posts+=g.posts;
-  DB.users[n].gallery=g.gallery||[];
-  DB.users[n].cks=Object.assign({},g.cks);
+  DB.users[id].pts+=g.pts;DB.users[id].ip+=g.ip;DB.users[id].shot+=g.shot;DB.users[id].posts+=g.posts;
+  DB.users[id].gallery=g.gallery||[];
+  DB.users[id].cks=Object.assign({},g.cks);
   DB.guest={pts:0,ip:0,shot:0,posts:0,cks:{},gallery:[]};
-  DB.me=n;saveDB();refreshMe();closeAuth();
-  toast('注册成功，已自动登录：'+n+(DB.admin===n?'（管理员）':''));
+  DB.me=id;saveDB();refreshMe();closeAuth();
 }
-function doLogin(){
-  const n=document.getElementById('logN').value.trim(),p=document.getElementById('logP').value;
-  const u=DB.users[n];
-  if(!u||u.pass!==hash(p)){toast('昵称或密码不正确');return}
-  DB.me=n;saveDB();refreshMe();closeAuth();toast('欢迎回来，'+n);
+function sendSms(){
+  const ph=document.getElementById('smsPhone').value.trim();
+  const e=phoneErr(ph);if(e){toast(e);return}
+  if(sms&&sms.ph===ph&&Date.now()<sms.exp){toast('验证码已发送，请查收短信');return}
+  const code=String(Math.floor(100000+Math.random()*900000));
+  sms={ph:ph,code:code,exp:Date.now()+10*60*1000};
+  /* 以系统短信通知的形式送达 */
+  document.getElementById('smsBannerCode').textContent=code;
+  const b=document.getElementById('smsBanner');
+  b.style.display='block';clearTimeout(b._t);b._t=setTimeout(()=>b.style.display='none',7000);
+  let s=60;const btn=document.getElementById('smsBtn');
+  btn.disabled=true;btn.textContent=s+'s';
+  clearInterval(smsT);smsT=setInterval(()=>{s--;if(s<=0){clearInterval(smsT);btn.disabled=false;btn.textContent='重新发送'}else btn.textContent=s+'s'},1000);
+  toast('验证码已发送至 +86 '+ph.slice(0,3)+'****'+ph.slice(7));
 }
+function doSmsGo(){
+  const ph=document.getElementById('smsPhone').value.trim(),cd=document.getElementById('smsCode').value.trim(),pw=document.getElementById('smsPwd').value;
+  const e=phoneErr(ph);if(e){toast(e);return}
+  if(!sms||sms.ph!==ph){toast('请先获取验证码');return}
+  if(Date.now()>sms.exp){toast('验证码已过期，请重新获取');return}
+  if(cd!==sms.code){toast('验证码不正确');return}
+  if(pw&&pw.length<6){toast('密码至少 6 位');return}
+  if(DB.users[ph]){ /* 老用户：验证码直接登录 */
+    if(pw)DB.users[ph].pass=hash(pw);
+    DB.me=ph;saveDB();refreshMe();closeAuth();toast('欢迎回来，'+accName());return;
+  }
+  const nick='城友'+String(1000+Math.floor(Math.random()*9000));
+  newAccount(ph,nick,pw?hash(pw):null);
+  toast('注册成功，已自动登录：'+nick+(DB.admin===ph?'（管理员）':''));
+}
+function doPwdLogin(){
+  const ph=document.getElementById('pwdPhone').value.trim(),pw=document.getElementById('pwdPass').value;
+  const e=phoneErr(ph);if(e){toast(e);return}
+  const u=DB.users[ph];
+  if(!u||!u.pass||u.pass!==hash(pw)){toast('手机号或密码不正确');return}
+  DB.me=ph;saveDB();refreshMe();closeAuth();toast('欢迎回来，'+accName());
+}
+/* 微信一键登录：在微信内打开时模拟 OAuth 授权确认 */
+const IN_WX=/MicroMessenger/i.test(navigator.userAgent);
+function wxLogin(){
+  if(!IN_WX){toast('请在微信中打开城忆后使用一键登录，也可用手机号注册');return}
+  document.getElementById('wxMask').style.display='block';
+  document.getElementById('wxBox').style.display='block';
+}
+function wxConfirm(){
+  document.getElementById('wxMask').style.display='none';
+  document.getElementById('wxBox').style.display='none';
+  /* 以设备内微信身份为键，同一设备内保持登录一致 */
+  let id=DB.wxId;
+  if(!id||!DB.users[id]){id='wx_'+Math.random().toString(36).slice(2,8);DB.wxId=id}
+  if(!DB.users[id]){
+    const nick='微信用户'+String(1000+Math.floor(Math.random()*9000));
+    newAccount(id,nick,null);
+    toast('微信登录成功：'+nick+(DB.admin===id?'（管理员）':''));
+  }else{
+    DB.me=id;saveDB();refreshMe();closeAuth();toast('欢迎回来，'+accName());
+  }
+}
+function wxCancel(){document.getElementById('wxMask').style.display='none';document.getElementById('wxBox').style.display='none'}
 function doLogout(){DB.me=null;saveDB();refreshMe();toast('已退出登录，当前为游客模式（数据仍保存在本机）')}
 
 /* ---------- 我的页 / 排行榜 / 后台 渲染 ---------- */
 function renderRank(){
-  const arr=Object.entries(DB.users).map(([n,u])=>[n,u.pts]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const arr=Object.entries(DB.users).map(([n,u])=>[(u&&u.nick)||n,u.pts]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const medals=['🥇','🥈','🥉'];
   document.getElementById('rankBox').innerHTML=arr.length
     ? arr.map((x,i)=>`<div>${medals[i]||'🏅'} ${esc(x[0])}　<b style="color:var(--red)">${x[1]}</b> 枚印章</div>`).join('')
@@ -541,22 +656,23 @@ function renderAdm(){
   document.getElementById('admQueue').innerHTML=all.length
     ? all.map(pt=>`<div class="adm"><b style="font-size:12px">${esc(pt.w)} @ ${esc(PTS[pt.i].n)}</b><span class="st ok">已公开</span><div class="muted">${esc(pt.x)}</div><div class="mt8"><button class="btn ghost sm" onclick="delPost(${pt.i},${pt.t})">下架</button></div></div>`).join('')
     : '<div class="muted" style="text-align:center;padding:10px 0">暂无公开内容</div>';
-  document.getElementById('admName').textContent=DB.admin||'（尚无注册用户）';
+  const au=DB.users[DB.admin];
+  document.getElementById('admName').textContent=au?(au.nick||DB.admin):'（尚无注册用户）';
 }
 function delPost(i,t){DB.posts[i]=(DB.posts[i]||[]).filter(p=>p.t!==t);PTS[i].posts=DB.posts[i];saveDB();renderAdm();toast('该内容已下架')}
 function clearAll(){if(confirm('确定清空本机全部数据并重置？此操作不可恢复。')){localStorage.removeItem(DBK);location.reload()}}
 function refreshMe(){
   const a=acc();
-  document.getElementById('meAvatar').textContent=DB.me?DB.me.slice(0,1):'客';
+  document.getElementById('meAvatar').textContent=DB.me?esc(accName()).slice(0,1):'客';
   document.getElementById('meAvatar').style.background=DB.me?'var(--red)':'#c9c2b4';
-  document.getElementById('meName').textContent=DB.me?DB.me:'游客 · 未登录';
+  document.getElementById('meName').textContent=DB.me?esc(accName()):'游客 · 未登录';
   document.getElementById('meStats').innerHTML=`打卡 ${Object.keys(a.cks||{}).length} 处 ｜ 发帖 ${a.posts||0} 条 ｜ IP 作品 ${a.ip||0} 个 ｜ 旅拍 ${a.shot||0} 张`;
   const lg=document.getElementById('meAuthBtn');
   lg.textContent=DB.me?'退出登录':'登录 / 注册';
   lg.onclick=DB.me?doLogout:openAuth;
   document.getElementById('ptShow').textContent=a.pts;
   const pb=document.getElementById('pushBtn');if(pb)pb.textContent=a.push?'🔕 关闭分身动态推送':'🔔 开启分身动态推送';
-  renderGallery();renderRank();renderAdm();
+  renderGallery();renderRank();renderAdm();renderShared();
 }
 
 /* ---------- 导航 ---------- */
@@ -686,19 +802,41 @@ function genIP(){
   };
   img.src=curFile;
 }
-function saveIP(){
+function saveIP(share){
   const a=acc();
   a.ip=(a.ip||0)+1;
   /* 生成缩略图存入本地作品库（最多 12 张，防止存储溢出） */
   const src=document.getElementById('ipCanvas');
   const tc=document.createElement('canvas');tc.width=150;tc.height=120;
   tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,120);
+  const title='IP作品 #'+a.ip+' · '+(cur!=null?PTS[cur].n:'自定义')+' · '+FN[curStyle]+'风';
   a.gallery=a.gallery||[];
-  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:'IP作品 #'+a.ip+' · '+(cur!=null?PTS[cur].n:'自定义')+' · '+FN[curStyle]+'风'});
+  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
   if(a.gallery.length>12)a.gallery.pop();
   saveDB();refreshMe();
-  toast('已存入我的 IP 库（本机保存），可在商城订制款使用');
+  toast(share?'已存入 IP 库并发布到共享作品墙':'已存入我的 IP 库（本机保存），可在商城订制款使用');
+  if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
   resetIP();
+}
+/* 共享作品墙：所有使用者可实时看到彼此发布的新作品 */
+function publishShared(d,t){
+  DB.shared.unshift({id:Date.now()+Math.random().toString(36).slice(2,5),d:d,t:t,w:accName(),ts:Date.now()});
+  if(DB.shared.length>30)DB.shared.pop();
+  saveDB();renderShared();
+}
+function delShared(id){
+  DB.shared=DB.shared.filter(x=>x.id!==id);
+  saveDB();renderShared();
+  if(DB.me&&DB.me===DB.admin)renderAdm();
+  toast('该共享作品已下架');
+}
+function renderShared(){
+  const box=document.getElementById('sharedList');if(!box)return;
+  document.getElementById('sharedN').textContent=(DB.shared||[]).length;
+  const adm=DB.me&&DB.me===DB.admin;
+  box.innerHTML=(DB.shared||[]).length
+    ? DB.shared.map(x=>`<div class="g" style="padding:6px"><img src="${x.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(x.t)}</div><div class="muted" style="font-size:10px">作者：${esc(x.w)}</div>${adm?`<button class="btn ghost sm mt8" style="width:100%" onclick="delShared('${x.id}')">下架</button>`:''}</div>`).join('')
+    : '<div class="muted">还没有人发布，第一个发布的就是封面</div>';
 }
 function resetIP(){
   curFile=null; document.getElementById('f').value='';
@@ -734,14 +872,16 @@ document.getElementById('shotStyles').addEventListener('click',e=>{
   document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
   setStepT(2);
 });
-document.getElementById('sf').addEventListener('change',e=>{
-  const f=e.target.files[0]; if(!f)return;
+function shotPicked(f){
   shotFile=URL.createObjectURL(f);
-  document.getElementById('faceDrop').innerHTML=
-    '<img id="facePrev" style="max-height:86px;border-radius:10px;border:1px solid var(--line)">面部采集完成 ✅';
+  document.getElementById('faceReady').style.display='block';
+  document.getElementById('faceReady').innerHTML=
+    '<img id="facePrev" style="max-height:86px;border-radius:10px;border:1px solid var(--line)"><div style="font-size:12px;margin-top:4px">面部采集完成 ✅</div>';
   document.getElementById('facePrev').src=shotFile;
   document.getElementById('genBtn').disabled=false;
-});
+}
+document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
+document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
 function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
 function genShot(){
   setStepT(3);
@@ -786,21 +926,24 @@ function genShot(){
   };
   img.src=shotFile;
 }
-function saveShot(){
+function saveShot(share){
   const a=acc();
   a.shot=(a.shot||0)+1;a.ip=(a.ip||0)+1;
   const src=document.getElementById('shotCanvas');
   const tc=document.createElement('canvas');tc.width=150;tc.height=186;
   tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,186);
+  const title='旅拍形象 #'+a.shot+' · '+SHOTS[shotStyle].n;
   a.gallery=a.gallery||[];
-  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:'旅拍形象 #'+a.shot+' · '+SHOTS[shotStyle].n});
+  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:title});
   if(a.gallery.length>12)a.gallery.pop();
   saveDB();refreshMe();
-  toast('已存入旅拍册（本机保存），可打印实体照片或订制文创');
+  toast(share?'已存入旅拍册并发布到共享作品墙':'已存入旅拍册（本机保存），可打印实体照片或订制文创');
+  if(share)publishShared(tc.toDataURL('image/jpeg',0.6),title);
   resetShot();
 }
 function resetShot(){
-  shotFile=null; document.getElementById('sf').value='';
+  shotFile=null; document.getElementById('sf').value=''; document.getElementById('su').value='';
+  document.getElementById('faceReady').style.display='none';
   document.getElementById('shotCanvas').style.display='none';
   document.getElementById('shot3').style.display='none';
   document.getElementById('shot2').style.display='none';
