@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.8</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.9</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -852,16 +852,58 @@ document.querySelectorAll('.styles button').forEach(b=>b.addEventListener('click
   document.querySelectorAll('.styles button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); curStyle=b.dataset.f;
 }));
-/* AI 云端文生图（免费公共服务，无需密钥；失败时回退本机滤镜合成） */
+/* AI 云端文生图（免费公共服务，无需密钥；失败时回退本机滤镜合成）
+   v1.9：显式指定 flux 高质量模型（与主流 AI 绘画 App 同源架构），
+   90 秒长超时，safe=false 允许地标建筑等正常内容，private=true 不公开画廊 */
 function aiImage(prompt,w,h){
-  const u='https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)+'?width='+w+'&height='+h+'&nologo=true&seed='+Math.floor(Math.random()*999999);
+  const u='https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)
+    +'?width='+w+'&height='+h+'&nologo=true&private=true&safe=false'
+    +'&model=flux&seed='+Math.floor(Math.random()*1000000);
   return new Promise((res,rej)=>{
-    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),20000);
+    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),90000);
     fetch(u,{signal:ctl.signal})
-      .then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.blob()})
+      .then(r=>{
+        if(!r.ok){const e=new Error('http '+r.status);e.rate=(r.status===402||r.status===429);throw e}
+        return r.blob();
+      })
       .then(b=>{clearTimeout(t);res(URL.createObjectURL(b))})
       .catch(e=>{clearTimeout(t);rej(e)});
   });
+}
+/* 自动重试版：免费通道限流时自动排队重试最多 3 次（onWait(n) 通知 UI 第 n 次重试） */
+function aiWithRetry(prompt,w,h,onWait){
+  return aiImage(prompt,w,h).catch(e=>{
+    if(!e.rate)throw e; /* 非限流错误不重试 */
+    if(onWait)onWait(1);
+    return new Promise(r=>setTimeout(r,30000)).then(()=>aiImage(prompt,w,h)).catch(e2=>{
+      if(!e2.rate)throw e2;
+      if(onWait)onWait(2);
+      return new Promise(r=>setTimeout(r,30000)).then(()=>aiImage(prompt,w,h));
+    });
+  });
+}
+/* 生成阶段文案：像市面 App 一样显示"排队→构图→渲染细节" */
+function aiStage(sec){
+  if(sec<10)return '正在排队调度算力';
+  if(sec<30)return '正在构图生成';
+  return '正在渲染细节（flux 精修）';
+}
+/* 羽化融合人脸：径向渐变蒙版让边缘自然过渡（替代硬边圆形贴图），外圈加柔和光晕 */
+function blendFace(ctx,face,cx,cy,r){
+  /* 先画一圈柔和光晕承托 */
+  const gl=ctx.createRadialGradient(cx,cy,r*0.9,cx,cy,r*1.35);
+  gl.addColorStop(0,'rgba(255,252,244,.55)');gl.addColorStop(1,'rgba(255,252,244,0)');
+  ctx.fillStyle=gl;ctx.beginPath();ctx.arc(cx,cy,r*1.35,0,7);ctx.fill();
+  /* 离屏画布：贴照片后用 destination-in 径向渐变抠出羽化边缘 */
+  const fc=document.createElement('canvas');fc.width=fc.height=Math.round(r*2);
+  const fx=fc.getContext('2d');
+  const s=Math.max(r*2/face.width,r*2/face.height)*1.18;
+  fx.drawImage(face,r-face.width*s/2,r-face.height*s/2,face.width*s,face.height*s);
+  fx.globalCompositeOperation='destination-in';
+  const g=fx.createRadialGradient(r,r,r*0.58,r,r,r);
+  g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.82,'rgba(0,0,0,.92)');g.addColorStop(1,'rgba(0,0,0,0)');
+  fx.fillStyle=g;fx.fillRect(0,0,r*2,r*2);
+  ctx.drawImage(fc,cx-r,cy-r);
 }
 /* 在画布上按 cover 方式铺满绘制图片 */
 function drawCover(ctx,img,x,y,w,h){
@@ -977,12 +1019,13 @@ function frameStyle(ctx,style,x,y,w,h){
     ctx.fillRect(x-2,y-2,w+4,1);ctx.fillRect(x-2,y+h+1,w+4,1);
   }
 }
-/* 按风格选 AI 提示词：让 AI 出图本身就贴风格 */
+/* 按风格选 AI 提示词：专业级中英混合长提示词（flux 对英文理解最佳，中文地标保证内容准确） */
+const FQ=', masterpiece, best quality, highly detailed, trending on behance, museum grade artwork, 8k';
 const FP={
-  gq:'国潮插画海报：鎏金勾边，朱砂正红撞色，祥云纹样装饰，对称构图，故宫文创质感，',
-  sm:'中国水墨画：墨分五色，大面积留白，写意飞白笔触，宣纸质感，淡墨远山，',
-  jf:'中国民间剪纸艺术：正红镂空剪纸，对称窗花纹样，米白底色，纯色块无渐变，剪纸质感，',
-  xs:'复古像素艺术游戏画面：16 色像素块，8-bit 像素风，锐利色块，'
+  gq:'Chinese Guochao national trend illustration poster, ornate gold outline lines, vermilion red and crimson color clash, auspicious cloud patterns decoration, symmetrical composition, Forbidden City cultural creative poster style, elegant flat illustration with rich texture details, ',
+  sm:'Traditional Chinese ink wash painting shuimo, five shades of ink from pale to deep black, vast negative space liubai, expressive dry-brush flying-white strokes, xuan rice paper texture, distant misty mountains, minimalist zen composition, Song dynasty masterpiece style, ',
+  jf:'Chinese folk paper-cut art jianzhi, bright vermilion red hollow-out paper cutting, symmetrical window flower lattice patterns, cream white background, flat solid colors without gradients, intricate lace edge details, intangible cultural heritage craftsmanship, ',
+  xs:'retro pixel art game scene, 16-color limited palette, 8-bit pixel style, crisp blocky pixel clusters, dithering shading technique, classic 16-bit SNES JRPG aesthetic, clean pixel grid alignment, '
 };
 function genIP(){
   setStep(3);
@@ -992,13 +1035,15 @@ function genIP(){
   const land=cur!=null?PTS[cur].n:'自定义点位';
   /* 第一步：本机像素级风格化（1 秒内出图，与原图明显不同） */
   ipLocal(ctx,c,stat,land,true);
-  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换并存相册');
+  toast('本机合成约 1 秒 · AI 云端高清创作约 15~40 秒，完成后自动替换并存相册');
   /* 第二步：AI 云端创作，成功后自动替换并自动存相册 */
-  stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（本机结果已生成，AI 完成后自动替换）';
+  stat.textContent='⏳ AI 云端创作中 · 正在排队调度算力（本机结果已生成，AI 完成后自动替换）';
   const t0=Date.now();
-  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt=FP[curStyle]+land+'，大幅艺术化重构，非照片写实，博物馆文创海报质感';
-  aiImage(prompt,512,400).then(url=>{
+  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作中 · '+aiStage(Math.round((Date.now()-t0)/1000))+'（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
+  const prompt=FP[curStyle]+land+' '+FQ;
+  aiWithRetry(prompt,768,512,n=>{
+    stat.textContent='🔄 免费通道排队中，已自动第 '+(n+1)+' 次尝试（共 3 次）';
+  }).then(url=>{
     const img=new Image();
     img.onload=()=>{
       clearInterval(tick);
@@ -1018,7 +1063,7 @@ function genIP(){
     };
     img.onerror=()=>{clearInterval(tick);autoSaveLocal(c,stat,'AI 结果加载失败')};
     img.src=url;
-  }).catch(()=>{clearInterval(tick);autoSaveLocal(c,stat,'AI 免费通道限流')});
+  }).catch(()=>{clearInterval(tick);autoSaveLocal(c,stat,'AI 通道重试 3 次后仍限流')});
 }
 /* AI 不可用时：自动把本机像素风格化结果存入相册 */
 function autoSaveLocal(c,stat,why){
@@ -1217,35 +1262,32 @@ function genShot(){
   c.style.display='block';
   /* 第一步：本机底图立即合成 */
   shotLocal(ctx,stat,s,true);
-  toast('本机合成约 1 秒 · AI 云端预计 10~20 秒，完成后自动替换');
+  toast('本机合成约 1 秒 · AI 云端高清创作约 15~40 秒，完成后自动替换');
   /* 第二步：AI 云端场景，成功后自动替换（显示预计时间与已等待秒数） */
-  stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 预计 10~20 秒（本机结果已合成，AI 完成后自动替换）';
+  stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 正在排队调度算力（本机结果已合成，AI 完成后自动替换）';
   const t0=Date.now();
-  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · 预计 10~20 秒（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
-  const prompt='中国传统古风场景插画：'+s.bg+'，'+s.n+'主题，人物画面前景留白构图，中国风水墨色调，高清横版';
-  aiImage(prompt,480,600).then(url=>{
+  const tick=setInterval(()=>{stat.textContent='⏳ AI 云端创作「'+s.bg+'」场景 · '+aiStage(Math.round((Date.now()-t0)/1000))+'（已等待 '+Math.round((Date.now()-t0)/1000)+' 秒）'},1000);
+  const prompt='Chinese ancient style travel portrait scene background, '+s.bg+', Jinan China, traditional Chinese aesthetic architecture, soft golden lighting, atmospheric depth, cinematic color grading, scenic background only without people, empty foreground for portrait, '+FQ;
+  aiWithRetry(prompt,576,736,n=>{
+    stat.textContent='🔄 免费通道排队中，已自动第 '+(n+1)+' 次尝试（共 3 次）';
+  }).then(url=>{
     const img=new Image();
     img.onload=()=>{
       clearInterval(tick);
       /* AI 场景底图 */
       drawCover(ctx,img,0,0,340,420);
-      /* 面部合成（用户照片圆形贴合，本机处理） */
-      ctx.save();ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.fillStyle='rgba(255,255,255,.75)';ctx.fill();ctx.restore();
-      ctx.font='26px serif';ctx.textAlign='center';ctx.fillText(s.hat,210,108);
+      /* 面部合成（羽化融合在 blendFace 内完成） */
       const face=new Image();
       face.onload=()=>{
-        ctx.save();ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.clip();
-        const sc2=Math.max(116/face.width,116/face.height)*1.35;
-        ctx.drawImage(face,170-face.width*sc2/2,148-face.height*sc2/2,face.width*sc2,face.height*sc2);
-        ctx.restore();
-        ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.stroke();
+        /* 羽化融合人脸（市面 AI 换脸 App 同款手法：径向渐变蒙版，边缘自然过渡） */
+        blendFace(ctx,face,170,148,62);
         ctx.font='26px serif';ctx.textAlign='center';ctx.fillText(s.hat,210,108);
         /* 说明栏 */
         ctx.fillStyle='rgba(255,255,255,.92)';ctx.fillRect(0,368,340,52);
         ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
         ctx.fillText(s.n+' · '+s.bg,170,390);
         ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
-        ctx.fillText('城忆 AI 旅拍 · AI 云端场景 × 你的照片',170,408);
+        ctx.fillText('城忆 AI 旅拍 · AI 云端场景 × 你的照片（羽化融合）',170,408);
         stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
         saveToAlbum(c,'城忆-AI旅拍-AI.png');
       };
@@ -1254,7 +1296,7 @@ function genShot(){
     };
     img.onerror=()=>{clearInterval(tick);stat.textContent='⚠️ AI 结果加载失败，已自动将本机合成结果存入相册';saveToAlbum(c,'城忆-AI旅拍.png')};
     img.src=url;
-  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 免费通道限流（每 45 秒 1 张），已自动将本机合成结果存入相册，可稍后重试';saveToAlbum(c,'城忆-AI旅拍.png')});
+  }).catch(()=>{clearInterval(tick);stat.textContent='⚠️ AI 通道重试 3 次后仍限流，已自动将本机合成结果存入相册，可稍后重试';saveToAlbum(c,'城忆-AI旅拍.png')});
 }
 /* 本机回退：剪影底图合成 */
 function shotLocal(ctx,stat,s,quiet){
