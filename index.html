@@ -119,37 +119,69 @@
   #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
   @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
   #ipCanvas{width:100%;display:block;border:none;border-radius:0}
-  /* IP 工坊 · 造物局 Pro 版式 */
-  .ip-hero{padding:14px 2px 0}
-  .ip-kicker{color:var(--red);font-size:9.5px;font-weight:800;letter-spacing:2px;display:flex;align-items:center;gap:8px}
-  .ip-kicker:before{content:"";width:22px;height:1px;background:var(--red)}
-  .ip-hero h1{font:500 23px/1.3 "Songti SC",STSong,serif;letter-spacing:1px;margin:8px 0 6px}
-  .ip-hero p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.8}
-  .ip-meta{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.8}
-  .ip-meta strong{font:18px "Songti SC",STSong,serif;color:var(--red);display:block}
-  .ip-rowhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .ip-rowhead b{font-size:13px}
-  .ip-count{font-size:9px;color:var(--muted);letter-spacing:1px}
-  .ip-up{display:flex;gap:12px;align-items:center;border:2px dashed #cbb;border-radius:14px;background:#fffdf8;padding:12px;cursor:pointer;transition:.2s}
-  .ip-up.drag{border-color:var(--gold);background:#fdf6e3}
-  .ip-up img{width:62px;height:62px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:none}
-  .ip-up.has-img{border-style:solid;border-color:var(--gold)}
-  .ip-up.has-img img{display:block}
-  .ip-up .up-icon{font-size:22px;color:var(--red);line-height:1}
-  .ip-up.has-img .up-icon{display:none}
-  .ip-upcopy{display:flex;flex-direction:column;gap:2px;font-size:12px;min-width:0}
-  .ip-upcopy span:last-child{font-size:10px;color:var(--muted)}
-  .ip-chip{font-size:10px;padding:3px 10px;border-radius:20px;background:#f2ede2;color:var(--muted)}
-  .ip-chip.busy{background:#fdf6e3;color:#a98a3c}
-  .ip-chip.ok{background:#e8f0ea;color:#2f5d3a}
-  #ipStage{border-radius:12px;border:1px solid var(--line);background:#faf6ef;min-height:150px;position:relative;overflow:hidden}
-  #ipStage .ip-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px}
-  #ipStage .ip-glyph{font-size:30px;color:#d8cdb8}
-  #ipStage .ip-ph b{color:#7a6f5c}
-  #ipStage.ready .ip-ph{display:none}
-  .ip-feat{flex:1;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;font-size:10.5px}
-  .ip-feat b{font-size:11px;display:block;margin-bottom:4px}
-  .ip-feat p{margin:0;color:var(--muted);line-height:1.6}
+  /* ===== 造物局 Pro 双栏工作台（IP 创作 + AI 旅拍共用） ===== */
+  #ipBusy{height:4px;border-radius:2px;background:#e2d8c6;overflow:hidden;display:none;margin:0 0 10px}
+  #ipProg{height:100%;width:0;background:linear-gradient(90deg,#a83e32,#c69a4c);transition:width .45s}
+  #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
+  @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
+  #ipCanvas,#shotCanvas{width:100%;border:none;border-radius:0}
+  .ws{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(270px,.96fr);gap:14px;align-items:stretch}
+  @media(max-width:760px){.ws{grid-template-columns:1fr}}
+  .pn{background:#fffdf9;border:1px solid #e9dfd0;border-radius:18px;box-shadow:0 12px 34px rgba(67,48,30,.08);padding:16px}
+  .pn-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .pn-head b{font-size:13.5px;letter-spacing:.3px}
+  .st-label{font-size:9px;color:var(--muted);letter-spacing:1.3px}
+  .chip{font-size:10px;padding:3px 10px;border-radius:20px;background:#f2ede2;color:var(--muted)}
+  .chip.busy{background:#fdf6e3;color:#a98a3c}
+  .chip.ok{background:#e8f0ea;color:#2f5d3a}
+  .chip.live{color:#2f5d3a}
+  .chip.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#76a37f;margin-right:6px}
+  .up2{min-height:150px;border:1.5px dashed #d9caba;border-radius:15px;background:linear-gradient(145deg,#fffdf9,#f8f2e7);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:.2s}
+  .up2:hover,.up2.drag{border-color:var(--red);background:#fbf4ed}
+  .up2 .upic{width:42px;height:42px;border-radius:13px;background:#f2e7d5;color:var(--red);display:grid;place-items:center;margin:0 auto 8px;font-size:20px}
+  .up2 b{display:block;font-size:12.5px}
+  .up2 .sub{display:block;margin-top:5px;color:var(--muted);font-size:10.5px}
+  .up2 img.upimg{display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+  .up2.has-img img.upimg{display:block}
+  .up2.has-img .upcontent{display:none}
+  .upcontent{padding:14px}
+  .helper2{font-size:10px;color:var(--muted);line-height:1.7;margin:8px 2px 14px}
+  .sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .sgrid.c3{grid-template-columns:repeat(3,1fr)}
+  .scard{min-width:0;border:1px solid #e9dfd0;background:#fffdfa;border-radius:13px;padding:8px 4px 9px;color:var(--ink);transition:.18s;cursor:pointer}
+  .scard:hover{transform:translateY(-2px);border-color:#d6b78a}
+  .scard.on{border:1.5px solid var(--gold);background:#fcf5e8;box-shadow:0 0 0 3px #c69a4c1a}
+  .scard .art{height:50px;border-radius:9px;display:grid;place-items:center;font-size:24px;margin-bottom:7px;background:linear-gradient(135deg,#eedcc2,#f8eee0)}
+  .scard:nth-child(2) .art{background:linear-gradient(135deg,#dce1dc,#f3f1e8)}
+  .scard:nth-child(3) .art{background:linear-gradient(135deg,#e9c2ad,#f7e3ce)}
+  .scard:nth-child(4) .art{background:linear-gradient(135deg,#dce6da,#e9e9d8)}
+  .scard b{display:block;font-size:10.5px}
+  .scard small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+  .idea2{width:100%;resize:vertical;min-height:56px;border:1px solid #e9dfd0;border-radius:11px;padding:10px 11px;font-size:12px;line-height:1.6;color:var(--ink);outline:none;background:#fffdfa;font-family:inherit}
+  .idea2:focus{border-color:#caa565;box-shadow:0 0 0 3px #c69a4c1a}
+  .pbtn{border:0;background:linear-gradient(135deg,#a83e32,#873128);color:#fff;border-radius:11px;padding:11px 14px;font-size:12px;font-weight:700;box-shadow:0 6px 14px #a83e3224;cursor:pointer}
+  .pbtn:disabled{opacity:.48;cursor:not-allowed}
+  .pbtn2{border:1px solid #e9dfd0;background:#fffdf9;color:var(--ink);border-radius:11px;padding:11px 14px;font-size:12px;cursor:pointer}
+  .pbtn2:hover{border-color:#cfad77}
+  .board{position:relative;min-height:300px;border-radius:15px;overflow:hidden;background:radial-gradient(ellipse at 48% 42%,#faf6ef 0,#e6d9c4 76%)}
+  .board:before,.board:after{content:"";position:absolute;inset:12px;border:1px solid #b89a6b55;border-radius:10px;pointer-events:none;z-index:1}
+  .board:after{inset:17px;border-style:dashed;opacity:.5}
+  .board.ready:before{border-color:#fff9}
+  .board.ready:after{display:none}
+  .board .bempty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;color:#8f806b;z-index:2}
+  .board .bempty .bic{font-size:42px;opacity:.65}
+  .board .bempty b{display:block;font-family:"Songti SC",STSong,serif;font-size:15px;font-weight:500;margin:10px 0 5px}
+  .board .bempty span{font-size:10px}
+  .board.ready .bempty{display:none}
+  .board canvas{position:relative;z-index:0;display:none}
+  .board.ready canvas{display:block}
+  .hero2{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:6px 0 14px}
+  .eyebrow2{display:flex;align-items:center;gap:8px;color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px}
+  .eyebrow2:before{content:"";width:22px;height:1px;background:var(--red)}
+  .hero2 h1{font-family:"Songti SC",STSong,serif;font-weight:500;font-size:clamp(20px,4.5vw,30px);letter-spacing:1px;margin:8px 0 6px}
+  .hero2 p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.8}
+  .hero-note{max-width:230px;text-align:right;color:var(--muted);font-size:10px;line-height:1.8}
+  .hero-note strong{font:20px "Songti SC",STSong,serif;color:var(--red);display:block}
   /* info */
   .doc{display:flex;justify-content:space-between;align-items:center;padding:11px 2px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}
   .doc:last-child{border-bottom:none}
@@ -173,7 +205,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v2.1</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v2.2</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -254,55 +286,59 @@
         <button class="btn ghost sm" id="mShot" onclick="setMode('shot')">📸 AI 旅拍 · 城市装扮</button>
       </div>
       <div id="ipFlow">
-        <div class="ip-hero">
-          <div class="ip-kicker">CITY MEMORY · CREATIVE STUDIO</div>
-          <h1>让城市记忆，成为你的作品</h1>
-          <p>从一张街景照片出发，选择东方风格，创作专属城市文创。<br>你的记忆，是这座城市最独特的素材。</p>
-          <div class="ip-meta"><strong>01 / 04</strong>上传照片 · 选择风格 · 生成作品 · 珍藏分享</div>
+        <div class="hero2">
+          <div>
+            <div class="eyebrow2">CITY MEMORY · CREATIVE STUDIO</div>
+            <h1>让城市记忆，成为你的作品</h1>
+            <p>从一张街景照片出发，选择东方风格，创作专属城市文创。<br>你的记忆，是这座城市最独特的素材。</p>
+          </div>
+          <div class="hero-note"><strong>01 / 04</strong>上传照片 · 选择风格 · 生成作品 · 珍藏分享</div>
         </div>
-        <div style="display:flex;gap:8px;margin:12px 0">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
           <button class="btn sm" id="mIp" onclick="setMode('ip')">🎨 点位 IP 创作</button>
           <button class="btn ghost sm" id="mShot" onclick="setMode('shot')">📸 AI 旅拍 · 城市装扮</button>
         </div>
-        <div class="card" style="padding:14px">
-          <div class="ip-rowhead"><b>创作设置</b><span class="ip-count">STEP 01 — 03</span></div>
-          <div class="ip-up" id="ipUpload" onclick="document.getElementById('f').click()">
-            <img id="upThumb" alt="上传照片预览">
-            <div class="ip-upcopy"><span class="up-icon">＋</span><b>点选一张城市记忆上传</b><span>街巷、建筑、老照片 · 电脑端可拖入图片</span></div>
+        <div class="ws">
+          <div class="pn">
+            <div class="pn-head"><b>创作设置</b><span class="st-label">STEP 01 — 03</span></div>
+            <div class="up2" id="ipUpload" onclick="document.getElementById('f').click()">
+              <img class="upimg" id="upThumb" alt="上传照片预览">
+              <div class="upcontent"><div class="upic">🏮</div><b>拖入一张城市记忆，或点击上传</b><span class="sub">街巷、建筑、老照片 · JPG / PNG</span></div>
+            </div>
+            <p class="helper2">◇ 照片在你的浏览器本地处理，不会上传服务器。上传即视为同意《二创授权协议》。</p>
+            <div style="display:flex;gap:8px">
+              <button class="pbtn2" style="flex:1" onclick="document.getElementById('fc').click()">📷 拍照采集</button>
+              <button class="pbtn2" style="flex:1" onclick="document.getElementById('f').click()">🖼️ 从相册选择</button>
+            </div>
+            <div class="pn-head" style="margin-top:18px"><b>选择创作风格</b><span class="st-label">STEP 02</span></div>
+            <div class="sgrid" id="ipStyles">
+              <button class="scard on" data-f="gq"><span class="art">🏮</span><b>东方国潮</b><small>朱砂 · 鎏金</small></button>
+              <button class="scard" data-f="sm"><span class="art">🌫️</span><b>水墨宣纸</b><small>墨韵 · 留白</small></button>
+              <button class="scard" data-f="jf"><span class="art">✂️</span><b>非遗剪纸</b><small>套色 · 刻线</small></button>
+              <button class="scard" data-f="xs"><span class="art">▦</span><b>复古像素</b><small>颗粒 · 怀旧</small></button>
+            </div>
+            <div class="pn-head" style="margin-top:16px;margin-bottom:7px"><b style="font-size:12px">✍️ 写下你的创作灵感</b><span class="st-label">选填 · AI 云端会采纳</span></div>
+            <textarea class="idea2" id="idea" placeholder="例如：泉水巷口的春日午后，加入窗棂纹样与暖金色……"></textarea>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="pbtn" id="ipMake" style="flex:1" onclick="genIP()" disabled>✦ 开始创作</button>
+              <button class="pbtn2" onclick="resetIP()">重新选择</button>
+            </div>
           </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn ghost sm" style="flex:1" onclick="document.getElementById('fc').click()">📷 拍照采集</button>
-            <button class="btn ghost sm" style="flex:1" onclick="document.getElementById('f').click()">🖼️ 从相册选择</button>
+          <div class="pn" style="background:#eee7db;display:flex;flex-direction:column">
+            <div class="pn-head"><b>作品预览</b><span class="chip" id="ipChip">等待创作</span></div>
+            <div id="ipBusy"><div id="ipProg"></div></div>
+            <div class="board" id="ipStage" style="flex:1">
+              <div class="bempty"><div class="bic">▧</div><b>一段城市记忆，正在等候成形</b><span>上传照片，选择风格，开始你的创作</span></div>
+              <canvas id="ipCanvas" width="340" height="260"></canvas>
+            </div>
+            <div id="ipStat" class="helper2" style="text-align:center">点击「开始创作」：1 秒出风格化作品，AI 云端完成后自动替换并存入相册</div>
+            <div style="display:flex;gap:8px">
+              <button class="pbtn2" style="flex:1" onclick="saveIP(0)">📲 存入相册</button>
+              <button class="pbtn2" style="flex:1" onclick="saveIP(1)">🏛️ 相册+共享墙</button>
+            </div>
+            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="restyleIP()">⟳ 换一种风格（本机秒换 · AI 自动跟进）</button>
+            <div class="helper2" style="text-align:center;margin-bottom:0">存入后原照片自动清除，可直接换一张重新生成</div>
           </div>
-          <input type="file" id="fc" accept="image/*" capture="user" hidden>
-          <input type="file" id="f" accept="image/*" hidden>
-          <div class="muted" style="font-size:10px;margin-top:6px">◇ 照片在你的浏览器本地处理，不上传服务器。支持：点位建筑照 / 老照片 / 手绘草图。上传即视为同意《二创授权协议》。</div>
-          <div class="ip-rowhead" style="margin-top:16px"><b>选择创作风格</b><span class="ip-count">STEP 02</span></div>
-          <div class="styles" id="ipStyles">
-            <button data-f="gq" class="on"><span class="sw">🏮</span><b>东方国潮</b><small>朱砂 · 鎏金</small></button>
-            <button data-f="sm"><span class="sw">🌫️</span><b>水墨宣纸</b><small>墨韵 · 留白</small></button>
-            <button data-f="jf"><span class="sw">✂️</span><b>非遗剪纸</b><small>套色 · 刻线</small></button>
-            <button data-f="xs"><span class="sw">▦</span><b>复古像素</b><small>颗粒 · 怀旧</small></button>
-          </div>
-          <label class="muted" style="font-size:11px;display:block">✍️ 写下你的创作灵感 <span style="opacity:.7">· 可选，AI 云端创作会采纳</span></label>
-          <textarea id="idea" placeholder="例如：泉水巷口的春日午后，加入窗棂纹样与暖金色……"></textarea>
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="btn" id="ipMake" style="flex:1" onclick="genIP()" disabled>✦ 开始创作</button>
-            <button class="btn ghost sm" onclick="resetIP()">重新选择</button>
-          </div>
-          <div class="ip-rowhead" style="margin-top:18px"><b>作品预览</b><span class="ip-chip" id="ipChip">等待创作</span></div>
-          <div id="ipBusy"><div id="ipProg"></div></div>
-          <div id="ipStage">
-            <div id="ipPlaceholder"><div class="ip-glyph">▧</div><b>一段城市记忆，正在等候成形</b><span>上传照片，选择风格，开始你的创作</span></div>
-            <canvas id="ipCanvas" width="340" height="260"></canvas>
-          </div>
-          <div id="ipStat" class="muted mt8" style="text-align:center">点击「开始创作」：1 秒出风格化作品，AI 云端完成后自动替换并存入相册</div>
-          <div class="mt12" style="display:flex;gap:8px">
-            <button class="btn gold" style="flex:1" onclick="saveIP(0)">📲 存入相册</button>
-            <button class="btn" style="flex:1" onclick="saveIP(1)">🏛️ 相册+共享墙</button>
-          </div>
-          <button class="btn ghost sm mt8" style="width:100%" onclick="restyleIP()">⟳ 换一种风格（本机秒换 · AI 自动跟进）</button>
-          <div class="muted mt8" style="font-size:11px;text-align:center">存入后原照片自动清除，可直接换一张重新生成</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px">
           <div class="ip-feat"><b>✳ 老照片新表达</b><p>为熟悉的街角添上一笔东方色彩，让城市记忆变成可收藏、可分享的作品。</p></div>
@@ -312,41 +348,53 @@
       </div>
             <!-- AI 旅拍 · 城市装扮（参考首都博物馆《AI旅拍》模式：风格选择→面部采集→AI实时合成） -->
       <div id="shotFlow" style="display:none">
-        <div class="steps">
-          <div id="t1" class="on">① 风格选择</div><div id="t2">② 面部采集</div><div id="t3">③ AI 实时合成</div>
-        </div>
-        <div class="card">
-          <div id="shot1">
-            <div class="styles" id="shotStyles"></div>
-            <div class="muted">标准化快节奏流程：先选<b>城市主题底图</b>（可随展览/城市快速复用），再<b>面部采集</b>，AI 实时合成你的城市装扮形象——无需真实出行，"原地"穿越进老城。全程约 10 秒。</div>
+        <div class="hero2">
+          <div>
+            <div class="eyebrow2"><span style="font-size:14px">✳</span> 城市记忆 · 创意再生</div>
+            <h1>把一座城，创作成你的故事</h1>
+            <p>上传一张正面照片，挑选喜欢的旅拍风格，AI 帮你"原地"穿越进老城。</p>
           </div>
-          <div id="shot2" style="display:none;text-align:center">
-            <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
+          <div class="hero-note">每一张老照片，都藏着一段未完待续的城市故事。<br>让记忆换一种方式，继续被看见。</div>
+        </div>
+        <div class="ws">
+          <div class="pn">
+            <div class="pn-head"><b>开始创作</b><span class="st-label">01 — 03</span></div>
+            <div class="helper2" style="margin:0 2px 10px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图可随展览/城市快速复用）</div>
+            <div class="pn-head" style="margin-bottom:8px"><b style="font-size:12px">选择旅拍风格</b><span class="st-label">STEP 01</span></div>
+            <div class="sgrid c3" id="shotStyles"></div>
+            <div class="pn-head" style="margin-top:16px;margin-bottom:8px"><b style="font-size:12px">面部采集</b><span class="st-label">STEP 02</span></div>
             <div style="display:flex;gap:8px">
-              <div class="drop" style="flex:1" onclick="document.getElementById('sf').click()">🤳 相机拍照采集<br><span style="font-size:10px">（调用相机拍摄）</span></div>
-              <div class="drop" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 从相册选择<br><span style="font-size:10px">（上传正面照）</span></div>
+              <button class="pbtn2" style="flex:1" onclick="document.getElementById('sf').click()">🤳 相机拍照采集</button>
+              <button class="pbtn2" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 从相册选择</button>
             </div>
-            <button class="btn ghost sm mt8" style="width:100%" onclick="openCam('shot')">📹 打开摄像头实时拍照（网页取景）</button>
+            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="openCam('shot')">📹 打开摄像头实时取景拍照（网页取景）</button>
             <input type="file" id="sf" accept="image/*" capture="user" hidden>
             <input type="file" id="su" accept="image/*" hidden>
             <div id="faceReady" style="display:none"></div>
-            <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
-          </div>
-          <div id="shot3" style="display:none;text-align:center">
-            <canvas id="shotCanvas" width="340" height="420" style="display:none;width:100%;border-radius:12px;border:1px solid var(--line)"></canvas>
-            <div id="shotStat" class="muted mt8">点击「AI 实时合成」：本机立即合成，AI 云端场景随后自动升级</div>
-            <div class="mt12" style="display:flex;gap:8px">
-              <button class="btn gold" style="flex:1" onclick="saveShot(0)">📲 存入相册</button>
-              <button class="btn" style="flex:1" onclick="saveShot(1)">🏛️ 相册+共享墙</button>
+            <p class="helper2">标准化快节奏流程：选城市主题底图 → 面部采集 → AI 实时合成你的城市装扮形象——无需真实出行，"原地"穿越进老城，全程约 10 秒。</p>
+            <div style="display:flex;gap:8px">
+              <button class="pbtn" id="genBtn" style="flex:1" disabled onclick="genShot()">✦ 生成我的城市旅拍</button>
+              <button class="pbtn2" onclick="resetShot()">重选</button>
             </div>
-            <div class="muted mt8" style="font-size:11px">存入后采集的照片自动清除，可直接换一张重新合成</div>
-            <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
-            <button class="btn" style="width:100%;margin-top:8px" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
-            <button class="btn ghost sm mt8" style="width:100%" onclick="resetShot()">再拍一张</button>
+          </div>
+          <div class="pn" style="background:#eee7db;display:flex;flex-direction:column">
+            <div class="pn-head"><b>作品预览</b><span class="chip live">AI 实时合成</span></div>
+            <div class="board" id="shotStage" style="flex:1">
+              <div class="bempty"><div class="bic">▧</div><b>你的灵感，即将成形</b><span>选择风格并完成面部采集，开始创作吧</span></div>
+              <canvas id="shotCanvas" width="340" height="420"></canvas>
+            </div>
+            <div id="shotStat" class="helper2" style="text-align:center">点击「生成我的城市旅拍」：本机立即合成，AI 云端场景随后自动升级</div>
+            <div style="display:flex;gap:8px">
+              <button class="pbtn2" style="flex:1" onclick="saveShot(0)">📲 存入相册</button>
+              <button class="pbtn2" style="flex:1" onclick="saveShot(1)">🏛️ 相册+共享墙</button>
+            </div>
+            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
+            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
+            <button class="pbtn2" style="width:100%;margin-top:8px" onclick="resetShot()">再拍一张</button>
           </div>
         </div>
       </div>
-      <div class="card">
+            <div class="card">
         <h2 class="sec" style="margin-top:0">我的 IP 库（<span id="ipN">0</span>）</h2>
         <div id="ipList" class="goods"><div class="muted">还没有作品，去生成第一个吧</div></div>
       </div>
@@ -900,7 +948,7 @@ let curFile=null, curStyle='gq', ipCount=0, ipGenSeq=0;
 const fi=document.getElementById('f');
 /* ipPick 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
 /* 预览区状态徽章（Pro 版能力） */
-function ipChip(t,cls){const el=document.getElementById('ipChip');if(!el)return;el.textContent=t;el.className='ip-chip'+(cls?' '+cls:'')}
+function ipChip(t,cls){const el=document.getElementById('ipChip');if(!el)return;el.textContent=t;el.className='chip'+(cls?' '+cls:'')}
 function ipPick(src){
   if(!src)return;
   curFile=src;
@@ -1365,17 +1413,14 @@ const SHOTS=[
 ];
 let shotStyle=0, shotFile=null, shotCount=0;
 document.getElementById('shotStyles').innerHTML=SHOTS.map((s,i)=>
-  `<button data-i="${i}" class="${i===0?'on':''}">${s.hat} ${s.n}</button>`).join('');
+  `<button data-i="${i}" class="scard${i===0?' on':''}"><span class="art">${s.hat}</span><b>${s.n}</b><small>${s.bg}</small></button>`).join('');
 document.getElementById('shotStyles').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b)return;
   document.querySelectorAll('#shotStyles button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); shotStyle=+b.dataset.i;
   document.getElementById('shotStyleName').textContent=SHOTS[shotStyle].n;
   document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
-  /* 切换面板：隐藏第①步，显示第②步面部采集（此前缺失导致无采集入口） */
-  document.getElementById('shot1').style.display='none';
-  document.getElementById('shot2').style.display='block';
-  setStepT(2);
+  toast('已选择「'+SHOTS[shotStyle].n+'」，请完成面部采集');
 });
 /* shotPicked 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
 function shotPicked(src){
@@ -1389,9 +1434,8 @@ function shotPicked(src){
 }
 document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
 document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
-function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
 function genShot(){
-  setStepT(3);
+  document.getElementById('shotStage').classList.add('ready');
   const c=document.getElementById('shotCanvas'),ctx=c.getContext('2d');
   const s=SHOTS[shotStyle];
   const stat=document.getElementById('shotStat');
@@ -1489,11 +1533,10 @@ function saveShot(share){
 function resetShot(){
   shotFile=null; document.getElementById('sf').value=''; document.getElementById('su').value='';
   document.getElementById('faceReady').style.display='none';
-  document.getElementById('shotCanvas').style.display='none';
-  document.getElementById('shot3').style.display='none';
-  document.getElementById('shot2').style.display='none';
-  document.getElementById('shot1').style.display='block'; setStepT(1);
+  document.getElementById('faceReady').innerHTML='';
+  document.getElementById('shotStage').classList.remove('ready');
   document.getElementById('genBtn').disabled=true;
+  toast('已重置，可重新选择风格与采集照片');
 }
 
 /* ---------- 推送开关 ---------- */
