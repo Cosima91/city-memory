@@ -205,7 +205,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v2.2</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v2.2.1</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -310,6 +310,8 @@
               <button class="pbtn2" style="flex:1" onclick="document.getElementById('fc').click()">📷 拍照采集</button>
               <button class="pbtn2" style="flex:1" onclick="document.getElementById('f').click()">🖼️ 从相册选择</button>
             </div>
+            <input type="file" id="fc" accept="image/*" capture="user" hidden>
+            <input type="file" id="f" accept="image/*" hidden>
             <div class="pn-head" style="margin-top:18px"><b>选择创作风格</b><span class="st-label">STEP 02</span></div>
             <div class="sgrid" id="ipStyles">
               <button class="scard on" data-f="gq"><span class="art">🏮</span><b>东方国潮</b><small>朱砂 · 鎏金</small></button>
