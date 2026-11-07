@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.7</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.7.1</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -1120,6 +1120,9 @@ document.getElementById('shotStyles').addEventListener('click',e=>{
   b.classList.add('on'); shotStyle=+b.dataset.i;
   document.getElementById('shotStyleName').textContent=SHOTS[shotStyle].n;
   document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
+  /* 切换面板：隐藏第①步，显示第②步面部采集（此前缺失导致无采集入口） */
+  document.getElementById('shot1').style.display='none';
+  document.getElementById('shot2').style.display='block';
   setStepT(2);
 });
 /* shotPicked 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
