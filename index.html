@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v1.6</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.7</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -265,6 +265,7 @@
               <div class="drop" style="flex:1" onclick="document.getElementById('sf').click()">🤳 相机拍照采集<br><span style="font-size:10px">（调用相机拍摄）</span></div>
               <div class="drop" style="flex:1" onclick="document.getElementById('su').click()">🖼️ 从相册选择<br><span style="font-size:10px">（上传正面照）</span></div>
             </div>
+            <button class="btn ghost sm mt8" style="width:100%" onclick="openCam('shot')">📹 打开摄像头实时拍照（网页取景）</button>
             <input type="file" id="sf" accept="image/*" capture="user" hidden>
             <input type="file" id="su" accept="image/*" hidden>
             <div id="faceReady" style="display:none"></div>
@@ -437,6 +438,17 @@
     微信用户一键登录
   </button>
   <button class="btn ghost sm mt8" style="width:100%" onclick="closeAuth()">先逛逛 · 游客模式</button>
+</div>
+
+<!-- 网页摄像头拍照（getUserMedia，电脑/部分手机可直接取景） -->
+<div id="camMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:140" onclick="closeCam()"></div>
+<div id="camBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,92%);background:#111;border-radius:16px;padding:12px;z-index:141;box-shadow:0 18px 50px rgba(0,0,0,.4)">
+  <div style="color:#fff;font-size:13px;margin-bottom:8px;text-align:center">📹 网页摄像头拍照 · 面向镜头取景</div>
+  <video id="camVideo" autoplay playsinline muted style="width:100%;border-radius:10px;background:#000;aspect-ratio:3/4;object-fit:cover"></video>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn gold" style="flex:1" onclick="camSnap()">📷 拍下这一帧</button>
+    <button class="btn ghost sm" onclick="closeCam()">取消</button>
+  </div>
 </div>
 
 <!-- 保存到手机相册（微信内长按保存） -->
@@ -825,16 +837,17 @@ const FL={gq:'saturate(1.7) contrast(1.15) hue-rotate(-8deg)',sm:'grayscale(1) c
 const FN={gq:'国潮插画',sm:'水墨',jf:'剪纸',xs:'像素'};
 let curFile=null, curStyle='gq', ipCount=0;
 const fi=document.getElementById('f');
-function ipPick(file){
-  if(!file)return;
-  curFile=URL.createObjectURL(file);
+/* ipPick 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
+function ipPick(src){
+  if(!src)return;
+  curFile=src;
   document.getElementById('srcImg').src=curFile;
   document.getElementById('step1').style.display='none';
   document.getElementById('step2').style.display='block';
   setStep(2);
 }
-fi.addEventListener('change',e=>ipPick(e.target.files[0]));
-document.getElementById('fc').addEventListener('change',e=>ipPick(e.target.files[0]));
+fi.addEventListener('change',e=>{const f=e.target.files[0];if(f)ipPick(URL.createObjectURL(f))});
+document.getElementById('fc').addEventListener('change',e=>{const f=e.target.files[0];if(f)ipPick(URL.createObjectURL(f))});
 document.querySelectorAll('.styles button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.styles button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); curStyle=b.dataset.f;
@@ -991,6 +1004,42 @@ function saveToAlbum(cv,name){
   }
 }
 function closeSave(){document.getElementById('saveMask').style.display='none';document.getElementById('saveBox').style.display='none'}
+/* ---------- 网页摄像头拍照（getUserMedia） ---------- */
+let camStream=null,camTarget=null;
+function openCam(target){
+  camTarget=target;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持网页摄像头，请用「相机拍照」按钮');return}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:720}},audio:false})
+    .then(stream=>{
+      camStream=stream;
+      document.getElementById('camVideo').srcObject=stream;
+      document.getElementById('camMask').style.display='block';
+      document.getElementById('camBox').style.display='block';
+    })
+    .catch(()=>{toast('无法访问摄像头：请允许浏览器使用摄像头权限，或改用「相机拍照/相册选择」')});
+}
+function closeCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  document.getElementById('camMask').style.display='none';
+  document.getElementById('camBox').style.display='none';
+}
+function camSnap(){
+  const v=document.getElementById('camVideo');
+  if(!v.videoWidth){toast('摄像头画面尚未就绪，请稍候再拍');return}
+  const c=document.createElement('canvas');
+  c.width=480;c.height=640;
+  const ctx=c.getContext('2d');
+  /* 按竖版 cover 裁切视频画面 */
+  const s=Math.max(480/v.videoWidth,640/v.videoHeight);
+  ctx.drawImage(v,(480-v.videoWidth*s)/2,(640-v.videoHeight*s)/2,v.videoWidth*s,v.videoHeight*s);
+  const data=c.toDataURL('image/jpeg',0.85);
+  closeCam();
+  if(camTarget==='shot'){
+    shotPicked(data);
+  }else if(camTarget==='ip'){
+    ipPick(data);
+  }
+}
 /* 共享作品墙：所有使用者可实时看到彼此发布的新作品 */
 function publishShared(d,t){
   DB.shared.unshift({id:Date.now()+Math.random().toString(36).slice(2,5),d:d,t:t,w:accName(),ts:Date.now()});
@@ -1073,16 +1122,18 @@ document.getElementById('shotStyles').addEventListener('click',e=>{
   document.getElementById('shotStyleBg').textContent=SHOTS[shotStyle].bg;
   setStepT(2);
 });
-function shotPicked(f){
-  shotFile=URL.createObjectURL(f);
+/* shotPicked 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
+function shotPicked(src){
+  if(!src)return;
+  shotFile=src;
   document.getElementById('faceReady').style.display='block';
   document.getElementById('faceReady').innerHTML=
     '<img id="facePrev" style="max-height:86px;border-radius:10px;border:1px solid var(--line)"><div style="font-size:12px;margin-top:4px">面部采集完成 ✅</div>';
   document.getElementById('facePrev').src=shotFile;
   document.getElementById('genBtn').disabled=false;
 }
-document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
-document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(f)});
+document.getElementById('sf').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
+document.getElementById('su').addEventListener('change',e=>{const f=e.target.files[0];if(f)shotPicked(URL.createObjectURL(f))});
 function setStepT(n){[1,2,3].forEach(i=>document.getElementById('t'+i).classList.toggle('on',i===n))}
 function genShot(){
   setStepT(3);
