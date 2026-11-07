@@ -121,13 +121,19 @@
   #ipProg{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .45s}
   #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
   @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
-  #ipCanvas{width:100%;display:block;border:none;border-radius:0}
   /* ===== 造物局 Pro 双栏工作台（IP 创作 + AI 旅拍共用） ===== */
   #ipBusy{height:4px;border-radius:2px;background:#e2d8c6;overflow:hidden;display:none;margin:0 0 10px}
   #ipProg{height:100%;width:0;background:linear-gradient(90deg,#a83e32,#c69a4c);transition:width .45s}
   #ipBusy.ai #ipProg{width:70%;animation:ipflow 1.5s ease-in-out infinite}
   @keyframes ipflow{0%{margin-left:-70%}100%{margin-left:100%}}
-  #ipCanvas,#shotCanvas{width:100%;border:none;border-radius:0}
+  /* 结果画板：干净全幅作品大图（与参考版式一致），canvas 仅作离屏渲染面 */
+  #ipCanvas,#shotCanvas{display:none}
+  .board img.fullart{display:none;max-width:94%;max-height:94%;object-fit:contain;border-radius:8px;box-shadow:0 10px 30px rgba(67,48,30,.22);z-index:0;position:relative}
+  .board.ready img.fullart{display:block}
+  .board .wm-line{position:absolute;bottom:13px;left:0;right:0;text-align:center;color:#8e826e;font-size:8px;letter-spacing:2px;z-index:2;display:none;pointer-events:none}
+  .board.ready .wm-line{display:block;color:#fff;text-shadow:0 1px 4px #0006}
+  .board .wm-seal{position:absolute;right:20px;bottom:18px;width:44px;height:44px;border:1px solid #fff9;border-radius:8px;color:#fff;text-shadow:0 1px 5px #0008;font-family:serif;font-size:12px;line-height:1.25;text-align:center;padding-top:8px;z-index:2;display:none;pointer-events:none;background:rgba(0,0,0,.1)}
+  .board.ready .wm-seal{display:block}
   .ws{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(270px,.96fr);gap:14px;align-items:stretch}
   @media(max-width:760px){.ws{grid-template-columns:1fr}}
   .pn{background:#fffdf9;border:1px solid #e9dfd0;border-radius:18px;box-shadow:0 12px 34px rgba(67,48,30,.08);padding:16px}
@@ -208,7 +214,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">正式版 v2.2.1</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v2.3</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -334,7 +340,9 @@
             <div id="ipBusy"><div id="ipProg"></div></div>
             <div class="board" id="ipStage" style="flex:1">
               <div class="bempty"><div class="bic">▧</div><b>一段城市记忆，正在等候成形</b><span>上传照片，选择风格，开始你的创作</span></div>
-              <canvas id="ipCanvas" width="340" height="260"></canvas>
+              <img class="fullart" id="ipArt" alt="IP 作品">
+              <div class="wm-line">城忆造物局 · CITY MEMORY</div>
+              <canvas id="ipCanvas" width="340" height="260" hidden></canvas>
             </div>
             <div id="ipStat" class="helper2" style="text-align:center">点击「开始创作」：1 秒出风格化作品，AI 云端完成后自动替换并存入相册</div>
             <div style="display:flex;gap:8px">
@@ -386,7 +394,9 @@
             <div class="pn-head"><b>作品预览</b><span class="chip live">AI 实时合成</span></div>
             <div class="board" id="shotStage" style="flex:1">
               <div class="bempty"><div class="bic">▧</div><b>你的灵感，即将成形</b><span>选择风格并完成面部采集，开始创作吧</span></div>
-              <canvas id="shotCanvas" width="340" height="420"></canvas>
+              <img class="fullart" id="shotArt" alt="城市旅拍作品">
+              <div class="wm-seal">城忆<br>创作</div>
+              <canvas id="shotCanvas" width="576" height="736" hidden></canvas>
             </div>
             <div id="shotStat" class="helper2" style="text-align:center">点击「生成我的城市旅拍」：本机立即合成，AI 云端场景随后自动升级</div>
             <div style="display:flex;gap:8px">
@@ -952,6 +962,9 @@ const FN={gq:'国潮插画',sm:'水墨',jf:'剪纸',xs:'像素'};
 let curFile=null, curStyle='gq', ipCount=0, ipGenSeq=0;
 const fi=document.getElementById('f');
 /* ipPick 接受 objectURL 或 dataURL（摄像头拍照用 dataURL） */
+/* 结果上屏：把离屏 canvas 导出为干净大图（参考版式：全幅作品，无烘焙装饰） */
+function ipShow(c){document.getElementById('ipArt').src=c.toDataURL('image/png')}
+function shotShow(c){document.getElementById('shotArt').src=c.toDataURL('image/png')}
 /* 预览区状态徽章（Pro 版能力） */
 function ipChip(t,cls){const el=document.getElementById('ipChip');if(!el)return;el.textContent=t;el.className='chip'+(cls?' '+cls:'')}
 function ipPick(src){
@@ -963,7 +976,7 @@ function ipPick(src){
   ipChip('照片已载入','');
   document.getElementById('ipMake').disabled=false;
   document.getElementById('ipStage').classList.remove('ready');
-  document.getElementById('ipCanvas').style.display='none';
+  document.getElementById('ipArt').removeAttribute('src');
   ipProgOff();
   toast('照片已载入，选择风格开始创作');
 }
@@ -1203,7 +1216,6 @@ function genIP(){
   const g=++ipGenSeq; /* 生成令牌：「换一种风格」重入时旧 AI 结果作废 */
   const c=document.getElementById('ipCanvas'),ctx=c.getContext('2d');
   const stat=document.getElementById('ipStat');
-  c.style.display='block';
   const land=cur!=null?PTS[cur].n:'自定义点位';
   const idea=(document.getElementById('idea').value||'').trim();
   /* 第一步：本机像素级风格化（1 秒内出图，与原图明显不同） */
@@ -1227,17 +1239,11 @@ function genIP(){
       if(g!==ipGenSeq)return;
       clearInterval(tick);
       ipProgOff();
-      ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
-      const w=300,h=200,x=(c.width-w)/2,y=22;
-      const off=renderStyled(img,w,h,curStyle); /* AI 图也过同一风格管线 */
-      ctx.save();
-      ctx.beginPath();ctx.roundRect(x,y,w,h,36);ctx.clip();
-      ctx.drawImage(off,x,y);
-      ctx.restore();
-      frameStyle(ctx,curStyle,x,y,w,h);
-      if(curStyle!=='sm')stampSeal(ctx,c.width,c.height);
-      ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='left';
-      ctx.fillText(land+' · '+FN[curStyle]+'风 · AI 创作',16,c.height-20);
+      /* AI 图全幅高清风格化（干净大图，装饰交给页面水印层） */
+      const off=renderStyled(img,960,720,curStyle);
+      c.width=960;c.height=720;
+      ctx.drawImage(off,0,0);
+      ipShow(c);
       stat.textContent='✅ 已升级为 AI 云端创作（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
       ipChip('作品已完成','ok');
       saveToAlbum(c,'城忆-IP作品-AI.png');
@@ -1256,16 +1262,12 @@ function autoSaveLocal(c,stat,why){
 function ipLocal(ctx,c,stat,land,quiet,done){
   const img=new Image();
   img.onload=()=>{
-    const w=240,h=180,x=(c.width-w)/2,y=26;
-    const off=renderStyled(img,w,h,curStyle);
-    ctx.fillStyle='#faf6ef';ctx.fillRect(0,0,c.width,c.height);
-    ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,36);ctx.clip();
-    ctx.drawImage(off,x,y);
-    ctx.restore();
-    frameStyle(ctx,curStyle,x,y,w,h);
-    if(curStyle!=='sm')stampSeal(ctx,c.width,c.height);
-    ctx.fillStyle='#2b2118'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
-    ctx.fillText(land+' · '+FN[curStyle]+'风', 16, c.height-24);
+    /* 全幅高清风格化（与参考版式一致：干净大图，装饰交给页面水印层） */
+    const W=960,H=720;
+    const off=renderStyled(img,W,H,curStyle);
+    c.width=W;c.height=H;
+    ctx.drawImage(off,0,0);
+    ipShow(c);
     if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机风格化合成（稍后可重试 AI 生成）';
     if(done)done();
   };
@@ -1398,7 +1400,7 @@ function resetIP(){
   document.getElementById('ipMake').disabled=true;
   ipChip('等待创作','');
   document.getElementById('ipStage').classList.remove('ready');
-  document.getElementById('ipCanvas').style.display='none';
+  document.getElementById('ipArt').removeAttribute('src');
   toast('已重置创作台，可换一张照片重新开始');
 }
 
@@ -1444,7 +1446,6 @@ function genShot(){
   const c=document.getElementById('shotCanvas'),ctx=c.getContext('2d');
   const s=SHOTS[shotStyle];
   const stat=document.getElementById('shotStat');
-  c.style.display='block';
   /* 第一步：本机底图立即合成 */
   shotLocal(ctx,stat,s,true);
   toast('本机合成约 1 秒 · AI 云端高清创作约 15~40 秒，完成后自动替换');
@@ -1459,20 +1460,14 @@ function genShot(){
     const img=new Image();
     img.onload=()=>{
       clearInterval(tick);
-      /* AI 场景底图 */
-      drawCover(ctx,img,0,0,340,420);
+      /* AI 场景底图（576×736 高清全幅） */
+      drawCover(ctx,img,0,0,576,736);
       /* 面部合成（羽化融合在 blendFace 内完成） */
       const face=new Image();
       face.onload=()=>{
         /* 羽化融合人脸（市面 AI 换脸 App 同款手法：径向渐变蒙版，边缘自然过渡） */
-        blendFace(ctx,face,170,148,62);
-        ctx.font='26px serif';ctx.textAlign='center';ctx.fillText(s.hat,210,108);
-        /* 说明栏 */
-        ctx.fillStyle='rgba(255,255,255,.92)';ctx.fillRect(0,368,340,52);
-        ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
-        ctx.fillText(s.n+' · '+s.bg,170,390);
-        ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
-        ctx.fillText('城忆 AI 旅拍 · AI 云端场景 × 你的照片（羽化融合）',170,408);
+        blendFace(ctx,face,288,262,106);
+        shotShow(c);
         stat.textContent='✅ 已升级为 AI 云端场景 × 你的照片（用时 '+Math.round((Date.now()-t0)/1000)+' 秒）· 已自动弹出保存';
         saveToAlbum(c,'城忆-AI旅拍-AI.png');
       };
@@ -1487,6 +1482,7 @@ function genShot(){
 function shotLocal(ctx,stat,s,quiet){
   const img=new Image();
   img.onload=()=>{
+    ctx.save();ctx.scale(576/340,736/420); /* 576×736 高清画布，按 340×420 坐标系绘制 */
     const g=ctx.createLinearGradient(0,0,0,300);g.addColorStop(0,s.sky[0]);g.addColorStop(1,s.sky[1]);
     ctx.fillStyle=g;ctx.fillRect(0,0,340,420);
     ctx.fillStyle='rgba(43,33,24,.28)';
@@ -1508,12 +1504,8 @@ function shotLocal(ctx,stat,s,quiet){
     ctx.drawImage(img,170-img.width*sc/2,148-img.height*sc/2,img.width*sc,img.height*sc);
     ctx.restore();
     ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(170,148,58,0,7);ctx.stroke();
-    ctx.font='26px serif';ctx.textAlign='center';ctx.fillText(s.hat,210,108);
-    ctx.fillStyle='#fff';ctx.fillRect(0,368,340,52);
-    ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
-    ctx.fillText(s.n+' · '+s.bg,170,390);
-    ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
-    ctx.fillText('城忆 AI 旅拍 · 城市主题底图复用',170,408);
+    ctx.restore();
+    shotShow(ctx.canvas);
     if(!quiet)stat.textContent='⚠️ AI 服务暂时不可用，已用本机底图合成（稍后可重试）';
   };
   img.onerror=()=>{if(!quiet)stat.textContent='⚠️ 请先完成面部采集'};
@@ -1540,6 +1532,7 @@ function resetShot(){
   document.getElementById('faceReady').style.display='none';
   document.getElementById('faceReady').innerHTML='';
   document.getElementById('shotStage').classList.remove('ready');
+  document.getElementById('shotArt').removeAttribute('src');
   document.getElementById('genBtn').disabled=true;
   toast('已重置，可重新选择风格与采集照片');
 }
