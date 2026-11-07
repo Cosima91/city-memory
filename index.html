@@ -189,6 +189,7 @@
           <div>🥇 泉客·阿济　<b style="color:var(--red)">127</b> 枚印章　·　趵突泉×23</div>
           <div>🥈 老城拾遗　<b style="color:var(--red)">96</b> 枚　·　曲水亭街×11</div>
           <div>🥉 明湖青年　<b style="color:var(--red)">81</b> 枚</div>
+          <div style="border-top:1px dashed var(--line);margin-top:4px;padding-top:4px">📍 你（游客）　<b id="myRank">0</b> 枚 · 打卡即可上榜</div>
         </div>
         <div class="muted mt8">在点位 500 米范围内可定位打卡，集印章兑文创（商城页）</div>
       </div>
@@ -292,8 +293,8 @@
       </div>
       <h2 class="sec">积分兑换</h2>
       <div class="card" style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:12px">当前印章积分：<b style="color:var(--red);font-size:17px" id="ptShow">127</b></div>
-        <button class="btn sm" onclick="toast('兑换成功（演示）：精美书签已加入订单')">兑换书签（60分）</button>
+        <div style="font-size:12px">当前印章积分：<b style="color:var(--red);font-size:17px" id="ptShow">0</b></div>
+        <button class="btn sm" onclick="redeem()">兑换书签（60分）</button>
       </div>
       <h2 class="sec">文创商城</h2>
       <div class="goods">
@@ -312,8 +313,9 @@
     <!-- ===================== 页5 我的 ===================== -->
     <div class="page" id="pg-me">
       <div class="card" style="display:flex;align-items:center;gap:12px">
-        <div style="width:52px;height:52px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">济</div>
-        <div><b style="font-size:14px">泉客·阿济</b><div class="muted">打卡 127 处 ｜ 投稿 8 条 ｜ IP 作品 <span id="ipN2">0</span> 个 ｜ 旅拍 <span id="shotN2">0</span> 张</div></div>
+        <div style="width:52px;height:52px;border-radius:50%;background:#c9c2b4;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">客</div>
+        <div><b style="font-size:14px">游客 · 未登录</b><div class="muted">打卡 0 处 ｜ 投稿 0 条 ｜ IP 作品 <span id="ipN2">0</span> 个 ｜ 旅拍 <span id="shotN2">0</span> 张</div></div>
+        <button class="btn sm" style="margin-left:auto" onclick="toast('注册/登录为演示功能：正式版支持手机号一键登录，游客可直接浏览、打卡、投稿')">登录 / 注册</button>
       </div>
       <h2 class="sec">时空来信 · 离馆后的长效运营</h2>
       <div class="card">
@@ -456,7 +458,7 @@ document.getElementById('natMap').insertAdjacentHTML('beforeend',
  NAT.map((a,i)=>`<div class="pin npin" style="left:${a[4]}%;top:${a[5]}%" data-p="${7+i}">
    <div class="dot"></div><div class="lb">${a[0]}</div></div>`).join(''));
 const CAT={1:["① 古迹与考古遗址","c1"],2:["② 历史建筑与街区","c2"],3:["③ 博物馆","c3"]};
-let cur=null, tagIdx=0, userPts=127;
+let cur=null, tagIdx=0, userPts=0;
 
 /* ---------- 导航 ---------- */
 function go(id,btn){
@@ -521,7 +523,15 @@ function doCheck(){
   document.getElementById('ckN').textContent=`已有 ${d.ck.toLocaleString()} 人在此打卡`;
   const b=document.getElementById('ckBtn'); b.disabled=true; b.textContent='✓ 已打卡';
   document.getElementById('ptShow').textContent=userPts;
+  const mr=document.getElementById('myRank'); if(mr)mr.textContent=userPts;
   toast('打卡成功 · 印章积分 +1（定位签到）');
+}
+function redeem(){
+  if(userPts<60){ toast('积分不足：当前 '+userPts+' 分，去地图打卡集章吧'); return; }
+  userPts-=60;
+  document.getElementById('ptShow').textContent=userPts;
+  const mr=document.getElementById('myRank'); if(mr)mr.textContent=userPts;
+  toast('兑换成功（演示）：精美书签已加入订单');
 }
 
 /* ---------- IP 工坊 ---------- */
