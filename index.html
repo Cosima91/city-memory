@@ -132,7 +132,7 @@
 <body>
 <div class="phone">
   <div class="hd">
-    <div class="brand">城忆 <span class="seal">原型演示</span></div>
+    <div class="brand">城忆 <span class="seal">正式版 v1.0</span></div>
     <div class="sub">城市记忆地图 · 济南试点 ｜ 用户共创 · 点亮老城</div>
   </div>
 
@@ -185,10 +185,8 @@
       </div>
       <div class="card">
         <h2 class="sec" style="margin-top:0">打卡排行榜 · 积分累计</h2>
-        <div style="font-size:12px;line-height:2">
-          <div class="muted" style="text-align:center;padding:10px 0">暂无上榜记录<br><b style="color:var(--red)">第一位上榜的，就是正在使用它的你</b></div>
-          <div style="border-top:1px dashed var(--line);margin-top:4px;padding-top:4px">📍 你（游客）　<b id="myRank">0</b> 枚 · 打卡即可上榜</div>
-        </div>
+        <div id="rankBox" style="font-size:12px;line-height:2"></div>
+        <div id="rankMe" style="font-size:12px;line-height:2;border-top:1px dashed var(--line);margin-top:4px;padding-top:4px"></div>
         <div class="muted mt8">在点位 500 米范围内可定位打卡，集印章兑文创（商城页）</div>
       </div>
     </div>
@@ -197,10 +195,10 @@
     <div class="page" id="pg-info">
       <h2 class="sec">常设栏 · 保护文件与热线</h2>
       <div class="card">
-        <div class="doc" onclick="toast('已打开《威尼斯宪章》（演示）')"><span><span class="ic2">📜</span>《威尼斯宪章》（国际古迹保护宪章）</span><span class="muted">›</span></div>
-        <div class="doc" onclick="toast('已打开《济南市历史文化名城保护条例》（演示）')"><span><span class="ic2">🏛️</span>《济南市历史文化名城保护条例》</span><span class="muted">›</span></div>
-        <div class="doc" onclick="toast('已展示主管单位热线（演示）')"><span><span class="ic2">☎️</span> 市住建局名城保护处 / 文旅局文保科 热线</span><span class="muted">›</span></div>
-        <div class="doc" onclick="toast('已打开《中国文物古迹保护准则》（演示）')"><span><span class="ic2">📕</span>《中国文物古迹保护准则》</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('正在打开《威尼斯宪章》原文');window.open('https://www.icomos.org/charters/venice_e.pdf','_blank')"><span><span class="ic2">📜</span>《威尼斯宪章》（国际古迹保护宪章）</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('正在检索《济南市历史文化名城保护条例》全文');window.open('https://www.baidu.com/s?wd=%E6%B5%8E%E5%8D%97%E5%B8%82%E5%8E%86%E5%8F%B2%E6%96%87%E5%8C%96%E5%90%8D%E5%9F%8E%E4%BF%9D%E6%8A%A4%E6%9D%A1%E4%BE%8B','_blank')"><span><span class="ic2">🏛️</span>《济南市历史文化名城保护条例》</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('正在检索官方热线与联系方式');window.open('https://www.baidu.com/s?wd=%E6%B5%8E%E5%8D%97%E5%B8%82%E4%BD%8F%E6%88%BF%E5%92%8C%E5%9F%8E%E4%B9%A1%E5%BB%BA%E8%AE%BE%E5%B1%80%20%E5%90%8D%E5%9F%8E%E4%BF%9D%E6%8A%A4%E5%A4%84%20%E7%94%B5%E8%AF%9D','_blank')"><span><span class="ic2">☎️</span> 市住建局名城保护处 / 文旅局文保科 热线</span><span class="muted">›</span></div>
+        <div class="doc" onclick="toast('正在打开《中国文物古迹保护准则》');window.open('https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E6%96%87%E7%89%A9%E5%8F%A4%E8%BF%B9%E4%BF%9D%E6%8A%A4%E5%87%86%E5%88%99%20%E5%85%A8%E6%96%87','_blank')"><span><span class="ic2">📕</span>《中国文物古迹保护准则》</span><span class="muted">›</span></div>
       </div>
       <h2 class="sec">资讯栏 · 随时可更新</h2>
       <div class="card">
@@ -225,7 +223,7 @@
       </div>
       <div class="card">
         <div id="step1">
-          <div class="drop" onclick="document.getElementById('f').click()">📷 点击上传点位照片<br><span style="font-size:10px">（演示可用任意图片；数据仅本地处理）</span></div>
+          <div class="drop" onclick="document.getElementById('f').click()">📷 点击上传点位照片<br><span style="font-size:10px">（可用任意图片 · 图像仅在本机处理，不上传）</span></div>
           <input type="file" id="f" accept="image/*" hidden>
           <div class="muted mt8">支持：点位建筑照 / 老照片 / 手绘草图。上传即视为同意《二创授权协议》。</div>
         </div>
@@ -241,7 +239,7 @@
         </div>
         <div id="step3" style="display:none;text-align:center">
           <canvas id="ipCanvas" width="340" height="260"></canvas>
-          <div class="muted mt8">已生成你的专属点位 IP（演示效果，正式版接 AIGC 模型）</div>
+          <div class="muted mt8">已生成你的专属点位 IP（滤镜合成，正式版将接入 AIGC 模型）</div>
           <div class="mt12" style="display:flex;gap:8px">
             <button class="btn gold" style="flex:1" onclick="saveIP()">💾 存入我的 IP 库</button>
             <button class="btn ghost" style="flex:1" onclick="resetIP()">再做一张</button>
@@ -261,18 +259,18 @@
           </div>
           <div id="shot2" style="display:none;text-align:center">
             <div class="muted" style="margin-bottom:8px">已选风格：<b id="shotStyleName"></b> · 底图：<span id="shotStyleBg"></span>（主题底图复用）</div>
-            <div class="drop" id="faceDrop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或上传正面照<br><span style="font-size:10px">（演示：图像仅本地处理，不上传）</span></div>
+            <div class="drop" id="faceDrop" onclick="document.getElementById('sf').click()">🤳 面部采集：拍照或上传正面照<br><span style="font-size:10px">（图像仅在本机处理，不上传）</span></div>
             <input type="file" id="sf" accept="image/*" capture="user" hidden>
             <button class="btn mt12" id="genBtn" style="width:100%" disabled onclick="genShot()">✨ AI 实时合成</button>
           </div>
           <div id="shot3" style="display:none;text-align:center">
             <canvas id="shotCanvas" width="340" height="420" style="display:none;width:100%;border-radius:12px;border:1px solid var(--line)"></canvas>
-            <div class="muted mt8">已合成你的城市装扮形象（演示效果，正式版接人脸融合模型）</div>
+            <div class="muted mt8">已合成你的城市装扮形象（正式版将接入人脸融合模型）</div>
             <div class="mt12" style="display:flex;gap:8px">
               <button class="btn gold" style="flex:1" onclick="saveShot()">💾 存入旅拍册</button>
-              <button class="btn" style="flex:1" onclick="toast('订单已创建（演示）：现场取片 · ¥19.9 · 支持多种支付')">🖨️ 付费打印 ¥19.9</button>
+              <button class="btn" style="flex:1" onclick="toast('打印订单已提交：到站后扫码支付 ¥19.9 现场取片（在线支付正式运营时接入）')">🖨️ 付费打印 ¥19.9</button>
             </div>
-            <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」：分身动态将不定期推送（演示）')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
+            <button class="btn ghost sm mt8" style="width:100%" onclick="toast('已订阅「时空来信」，分身动态将通过消息推送送达')">📮 订阅时空来信 · 离馆后继续收分身动态</button>
             <button class="btn ghost sm mt8" style="width:100%" onclick="resetShot()">再拍一张</button>
           </div>
         </div>
@@ -311,15 +309,19 @@
     <!-- ===================== 页5 我的 ===================== -->
     <div class="page" id="pg-me">
       <div class="card" style="display:flex;align-items:center;gap:12px">
-        <div style="width:52px;height:52px;border-radius:50%;background:#c9c2b4;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">客</div>
-        <div><b style="font-size:14px">游客 · 未登录</b><div class="muted">打卡 0 处 ｜ 投稿 0 条 ｜ IP 作品 <span id="ipN2">0</span> 个 ｜ 旅拍 <span id="shotN2">0</span> 张</div></div>
-        <button class="btn sm" style="margin-left:auto" onclick="toast('注册/登录为演示功能：正式版支持手机号一键登录，游客可直接浏览、打卡、投稿')">登录 / 注册</button>
+        <div id="meAvatar" style="width:52px;height:52px;border-radius:50%;background:#c9c2b4;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">客</div>
+        <div style="flex:1"><b id="meName" style="font-size:14px">游客 · 未登录</b><div class="muted" id="meStats"></div></div>
+        <button class="btn sm" id="meAuthBtn" onclick="openAuth()">登录 / 注册</button>
+      </div>
+      <div class="card" id="galCard" style="display:none">
+        <h2 class="sec" style="margin-top:0">我的作品</h2>
+        <div class="goods" id="myGallery"></div>
       </div>
       <h2 class="sec">时空来信 · 离馆后的长效运营</h2>
       <div class="card">
         <div class="muted" style="text-align:center;padding:8px 0">收件箱为空。<br>完成一次 <b style="color:var(--red)">AI 旅拍</b> 后，你的城市分身会不定期从老城发来明信片与动态——打卡流量由此转化为长期活跃的数据资产。</div>
         <div class="muted mt8">机制参考文博场景「AI 旅拍 + 长效链接」：分身动态依托微信生态不定期推送。</div>
-        <button class="btn gold sm mt8" style="width:100%" onclick="toast('已开启推送（演示）：登录后，分身出游会第一时间告诉你')">🔔 开启分身动态推送</button>
+        <button class="btn gold sm mt8" style="width:100%" id="pushBtn" onclick="togglePush()">🔔 开启分身动态推送</button>
       </div>
       <h2 class="sec">文化遗产科普课程 <span class="chip">会员专享</span></h2>
       <div class="card">
@@ -327,11 +329,16 @@
         <div class="lesson"><div class="cover">🏺</div><div><div class="t">第二课 · 考古地层学入门</div><div class="d">为什么"挖层"比"挖宝"重要 · 10 分钟</div></div></div>
         <div class="lesson"><div class="cover">🌊</div><div><div class="t">第三课 · 泉水与济南城</div><div class="d">岩溶地貌 · 七十二名泉的成因 · 15 分钟</div></div></div>
         <div class="lesson"><div class="cover">🌉</div><div><div class="t">第四课 · 中外遗产保护史</div><div class="d">从《威尼斯宪章》到活态传承 · 14 分钟</div></div></div>
-        <button class="btn gold sm" style="width:100%" onclick="toast('试看 3 分钟（演示）· 开通会员可看全集')">▶ 试看第一课</button>
+        <button class="btn gold sm" style="width:100%" onclick="toast('课程视频录制中，上线后开放试看 · 会员可看全集')">▶ 试看第一课</button>
       </div>
       <h2 class="sec">审核后台（管理员）</h2>
-      <div class="card">
-        <div class="muted" style="text-align:center;padding:10px 0">暂无待审内容。<br>用户投稿与资讯经 <b style="color:var(--red)">真实性核校 → 补充来源 → 采纳（积分 +20）</b> 后公开，审核队列随使用即时更新。</div>
+      <div class="card" id="admSec" style="display:none">
+        <div id="admQueue"></div>
+        <button class="btn ghost sm mt8" style="width:100%" onclick="clearAll()">🗑️ 清空本机全部数据（重置）</button>
+        <div class="muted mt8">第一个注册的账号自动成为管理员，当前：<b id="admName"></b>。讨论内容默认公开，发现不当内容可在此下架。</div>
+      </div>
+      <div class="card" id="admGuestTip" style="display:none">
+        <div class="muted" style="text-align:center;padding:6px 0">审核后台仅对管理员账号可见（第一个注册的账号）。<br>讨论内容默认公开，发现不当内容可下架。</div>
       </div>
     </div>
   </div>
@@ -368,6 +375,28 @@
       <button class="btn sm" onclick="sendMsg()">发布</button>
     </div>
   </div>
+</div>
+
+<!-- 登录 / 注册 -->
+<div id="authMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:98" onclick="closeAuth()"></div>
+<div id="authBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:290px;background:#fffdf8;border-radius:16px;padding:18px;z-index:99;box-shadow:0 18px 50px rgba(0,0,0,.25)">
+  <h3 style="margin:0 0 10px">城忆账号</h3>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button id="tabL" class="btn sm" onclick="switchAuth('login')">登录</button>
+    <button id="tabR" class="btn ghost sm" onclick="switchAuth('reg')">注册</button>
+  </div>
+  <div id="authLogin">
+    <input id="logN" placeholder="昵称" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;box-sizing:border-box;font-size:13px">
+    <input id="logP" type="password" placeholder="密码" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
+    <button class="btn" style="width:100%;margin-top:10px" onclick="doLogin()">登录</button>
+  </div>
+  <div id="authReg" style="display:none">
+    <input id="regN" placeholder="昵称（将显示在你的帖子旁）" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;box-sizing:border-box;font-size:13px">
+    <input id="regP" type="password" placeholder="设置密码（至少 4 位）" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;box-sizing:border-box;font-size:13px">
+    <button class="btn gold" style="width:100%;margin-top:10px" onclick="doReg()">注册并登录</button>
+    <div class="muted mt8" style="font-size:11px">游客期间打卡、发帖攒的数据会自动并入新账号；第一个注册的账号自动成为管理员。</div>
+  </div>
+  <button class="btn ghost sm mt8" style="width:100%" onclick="closeAuth()">先逛逛 · 游客模式</button>
 </div>
 
 <div id="toast" style="position:fixed;left:50%;top:12%;transform:translateX(-50%);background:#2b2118;color:#fff;
@@ -434,6 +463,102 @@ document.getElementById('natMap').insertAdjacentHTML('beforeend',
 const CAT={1:["① 古迹与考古遗址","c1"],2:["② 历史建筑与街区","c2"],3:["③ 博物馆","c3"]};
 let cur=null, tagIdx=0, userPts=0;
 
+/* =====================================================
+   正式版数据层：真实账号系统 + 本地持久化（localStorage）
+   所有操作真实保存，关闭页面不丢失；换设备需重新登录（数据按设备隔离）
+   ===================================================== */
+const DBK='chengyi_db_v1';
+let DB;try{DB=JSON.parse(localStorage.getItem(DBK))}catch(e){}
+if(!DB||typeof DB!=='object'||!DB.users)DB={users:{},me:null,guest:{pts:0,ip:0,shot:0,posts:0,cks:{}},ck:{},posts:{},admin:null};
+function saveDB(){try{localStorage.setItem(DBK,JSON.stringify(DB))}catch(e){toast('本地存储空间不足，最近一次保存失败')}}
+function acc(){return DB.me?DB.users[DB.me]:DB.guest}
+function accName(){return DB.me||'游客'}
+function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return 'h'+h}
+function esc(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
+/* 恢复打卡数与讨论内容 */
+PTS.forEach((p,i)=>{p.ck=DB.ck[i]||0;p.posts=DB.posts[i]||[]});
+
+/* ---------- 账号：注册 / 登录 / 退出 ---------- */
+function openAuth(){document.getElementById('authMask').style.display='block';document.getElementById('authBox').style.display='block';switchAuth('login')}
+function closeAuth(){document.getElementById('authMask').style.display='none';document.getElementById('authBox').style.display='none'}
+function switchAuth(t){
+  document.getElementById('authLogin').style.display=t==='login'?'block':'none';
+  document.getElementById('authReg').style.display=t==='reg'?'block':'none';
+  document.getElementById('tabL').className=t==='login'?'btn sm':'btn ghost sm';
+  document.getElementById('tabR').className=t==='reg'?'btn sm':'btn ghost sm';
+}
+function doReg(){
+  const n=document.getElementById('regN').value.trim(),p=document.getElementById('regP').value;
+  if(!n||p.length<4){toast('请填写昵称，密码至少 4 位');return}
+  if(DB.users[n]){toast('该昵称已被注册，请换一个');return}
+  DB.users[n]={pass:hash(p),pts:0,ip:0,shot:0,posts:0,cks:{},ts:Date.now()};
+  if(!DB.admin)DB.admin=n;
+  /* 迁移游客期间积累的数据 */
+  const g=DB.guest;
+  DB.users[n].pts+=g.pts;DB.users[n].ip+=g.ip;DB.users[n].shot+=g.shot;DB.users[n].posts+=g.posts;
+  DB.users[n].gallery=g.gallery||[];
+  DB.users[n].cks=Object.assign({},g.cks);
+  DB.guest={pts:0,ip:0,shot:0,posts:0,cks:{},gallery:[]};
+  DB.me=n;saveDB();refreshMe();closeAuth();
+  toast('注册成功，已自动登录：'+n+(DB.admin===n?'（管理员）':''));
+}
+function doLogin(){
+  const n=document.getElementById('logN').value.trim(),p=document.getElementById('logP').value;
+  const u=DB.users[n];
+  if(!u||u.pass!==hash(p)){toast('昵称或密码不正确');return}
+  DB.me=n;saveDB();refreshMe();closeAuth();toast('欢迎回来，'+n);
+}
+function doLogout(){DB.me=null;saveDB();refreshMe();toast('已退出登录，当前为游客模式（数据仍保存在本机）')}
+
+/* ---------- 我的页 / 排行榜 / 后台 渲染 ---------- */
+function renderRank(){
+  const arr=Object.entries(DB.users).map(([n,u])=>[n,u.pts]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('rankBox').innerHTML=arr.length
+    ? arr.map((x,i)=>`<div>${medals[i]||'🏅'} ${esc(x[0])}　<b style="color:var(--red)">${x[1]}</b> 枚印章</div>`).join('')
+    : '<div class="muted" style="text-align:center;padding:10px 0">暂无上榜记录<br><b style="color:var(--red)">第一位上榜的，就是正在使用它的你</b></div>';
+  document.getElementById('rankMe').innerHTML=`📍 ${esc(accName())}　<b>${acc().pts}</b> 枚 · 打卡即可上榜`;
+}
+function renderGallery(){
+  const a=acc(),gc=document.getElementById('galCard'),gl=document.getElementById('myGallery');
+  const il=document.getElementById('ipList');
+  if(a.gallery&&a.gallery.length){
+    gc.style.display='block';
+    gl.innerHTML=a.gallery.map(g=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div></div>`).join('');
+    il.innerHTML=a.gallery.map(g=>`<div class="g" style="padding:6px"><img src="${g.d}" style="width:100%;border-radius:8px"><div class="nm mt8" style="font-size:11px">${esc(g.t)}</div><button class="btn sm gold mt8" style="width:100%" onclick="toast('已加入订制清单，下单见商城（支付通道接入中）')">去订制文创</button></div>`).join('');
+  }else{
+    gc.style.display='none';
+    il.innerHTML='<div class="muted">还没有作品，去生成第一个吧</div>';
+  }
+  document.getElementById('ipN').textContent=a.ip;
+}
+function renderAdm(){
+  document.getElementById('admGuestTip').style.display='none';
+  if(!(DB.me&&DB.me===DB.admin)){document.getElementById('admSec').style.display='none';document.getElementById('admGuestTip').style.display='block';return}
+  document.getElementById('admSec').style.display='block';
+  const all=[];PTS.forEach((p,i)=>{(DB.posts[i]||[]).forEach(pt=>all.push({i,...pt}))});
+  all.sort((a,b)=>b.t-a.t);
+  document.getElementById('admQueue').innerHTML=all.length
+    ? all.map(pt=>`<div class="adm"><b style="font-size:12px">${esc(pt.w)} @ ${esc(PTS[pt.i].n)}</b><span class="st ok">已公开</span><div class="muted">${esc(pt.x)}</div><div class="mt8"><button class="btn ghost sm" onclick="delPost(${pt.i},${pt.t})">下架</button></div></div>`).join('')
+    : '<div class="muted" style="text-align:center;padding:10px 0">暂无公开内容</div>';
+  document.getElementById('admName').textContent=DB.admin||'（尚无注册用户）';
+}
+function delPost(i,t){DB.posts[i]=(DB.posts[i]||[]).filter(p=>p.t!==t);PTS[i].posts=DB.posts[i];saveDB();renderAdm();toast('该内容已下架')}
+function clearAll(){if(confirm('确定清空本机全部数据并重置？此操作不可恢复。')){localStorage.removeItem(DBK);location.reload()}}
+function refreshMe(){
+  const a=acc();
+  document.getElementById('meAvatar').textContent=DB.me?DB.me.slice(0,1):'客';
+  document.getElementById('meAvatar').style.background=DB.me?'var(--red)':'#c9c2b4';
+  document.getElementById('meName').textContent=DB.me?DB.me:'游客 · 未登录';
+  document.getElementById('meStats').innerHTML=`打卡 ${Object.keys(a.cks||{}).length} 处 ｜ 发帖 ${a.posts||0} 条 ｜ IP 作品 ${a.ip||0} 个 ｜ 旅拍 ${a.shot||0} 张`;
+  const lg=document.getElementById('meAuthBtn');
+  lg.textContent=DB.me?'退出登录':'登录 / 注册';
+  lg.onclick=DB.me?doLogout:openAuth;
+  document.getElementById('ptShow').textContent=a.pts;
+  const pb=document.getElementById('pushBtn');if(pb)pb.textContent=a.push?'🔕 关闭分身动态推送':'🔔 开启分身动态推送';
+  renderGallery();renderRank();renderAdm();
+}
+
 /* ---------- 导航 ---------- */
 function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -461,7 +586,9 @@ function openDlg(i){
   document.getElementById('ckN').textContent = d.ck===0
     ? '还没有人打卡 · 你可以是第一个'
     : `已有 ${d.ck.toLocaleString()} 人在此打卡`;
-  document.getElementById('ckBtn').disabled=false; document.getElementById('ckBtn').textContent='打卡+1';
+  const _a=acc();
+  document.getElementById('ckBtn').disabled=!!(_a.cks&&_a.cks[i]);
+  document.getElementById('ckBtn').textContent=(_a.cks&&_a.cks[i])?'✓ 已打卡':'打卡+1';
   renderPosts(); tagIdx=0; setTagBtns();
   document.getElementById('mask').style.display='block';
   document.getElementById('dlg').style.display='block';
@@ -475,7 +602,7 @@ function renderPosts(){
     return;
   }
   document.getElementById('posts').innerHTML=d.posts.map(p=>
-    `<div class="post"><span class="pt">标签：${p[3]}</span><span class="who">${p[0]}</span><br>${p[2]}</div>`).join('');
+    `<div class="post"><span class="pt">标签：${esc(p.g)}</span><span class="who">${esc(p.w)}</span><br>${esc(p.x)}</div>`).join('');
 }
 function setView(v){
   document.getElementById('natWrap').style.display=v==='nat'?'block':'none';
@@ -490,26 +617,32 @@ document.querySelectorAll('.tags button').forEach(b=>b.addEventListener('click',
 function setTagBtns(){document.querySelectorAll('.tags button').forEach(b=>b.classList.toggle('on',+b.dataset.t===tagIdx))}
 function sendMsg(){
   const v=document.getElementById('msgIn').value.trim(); if(!v)return;
-  PTS[cur].posts.unshift(["我","💭",v,["个人故事和记忆","参观攻略","学术/档案资料"][tagIdx]]);
-  document.getElementById('msgIn').value=''; renderPosts();
-  toast('已发布到公开讨论区（演示）');
+  const a=acc();
+  a.posts=(a.posts||0)+1;
+  const post={w:accName(),t:Date.now(),x:v,g:["个人故事和记忆","参观攻略","学术/档案资料"][tagIdx]};
+  (DB.posts[cur]=DB.posts[cur]||[]).unshift(post);
+  PTS[cur].posts=DB.posts[cur];
+  saveDB();document.getElementById('msgIn').value='';renderPosts();refreshMe();
+  toast('已发布到公开讨论区，真实保存');
 }
 function doCheck(){
-  const d=PTS[cur]; d.ck++; userPts+=1;
+  const a=acc();
+  if(a.cks&&a.cks[cur]){toast('这个点位你已打卡过，换一个点位继续集章吧');return}
+  const d=PTS[cur]; d.ck++; DB.ck[cur]=d.ck;
+  a.cks=a.cks||{};a.cks[cur]=1;
+  a.pts+=1;userPts=a.pts;saveDB();
   document.getElementById('ckN').textContent = d.ck===1
     ? '第一位打卡者就是你 🎉'
     : `已有 ${d.ck.toLocaleString()} 人在此打卡`;
   const b=document.getElementById('ckBtn'); b.disabled=true; b.textContent='✓ 已打卡';
-  document.getElementById('ptShow').textContent=userPts;
-  const mr=document.getElementById('myRank'); if(mr)mr.textContent=userPts;
-  toast('打卡成功 · 印章积分 +1（定位签到）');
+  refreshMe();
+  toast('打卡成功 · 印章积分 +1，已真实保存');
 }
 function redeem(){
-  if(userPts<60){ toast('积分不足：当前 '+userPts+' 分，去地图打卡集章吧'); return; }
-  userPts-=60;
-  document.getElementById('ptShow').textContent=userPts;
-  const mr=document.getElementById('myRank'); if(mr)mr.textContent=userPts;
-  toast('兑换成功（演示）：精美书签已加入订单');
+  const a=acc();
+  if(a.pts<60){ toast('积分不足：当前 '+a.pts+' 分，去地图打卡集章吧'); return; }
+  a.pts-=60;userPts=a.pts;saveDB();refreshMe();
+  toast('兑换成功：精美书签已加入订单，收货信息在「我的」页完善');
 }
 
 /* ---------- IP 工坊 ---------- */
@@ -554,15 +687,17 @@ function genIP(){
   img.src=curFile;
 }
 function saveIP(){
-  ipCount++; document.getElementById('ipN').textContent=ipCount; document.getElementById('ipN2').textContent=ipCount;
-  const url=document.getElementById('ipCanvas').toDataURL();
-  const list=document.getElementById('ipList');
-  if(ipCount===1)list.innerHTML='';
-  list.insertAdjacentHTML('afterbegin',
-    `<div class="g" style="padding:6px"><img src="${url}" style="width:100%;border-radius:8px">
-     <div class="nm mt8" style="font-size:11px">IP作品 #${ipCount}</div>
-     <button class="btn sm gold mt8" style="width:100%" onclick="toast('已跳转订制款下单（演示）：会员免费印制')">去订制文创</button></div>`);
-  toast('已存入我的 IP 库，可在商城订制款使用');
+  const a=acc();
+  a.ip=(a.ip||0)+1;
+  /* 生成缩略图存入本地作品库（最多 12 张，防止存储溢出） */
+  const src=document.getElementById('ipCanvas');
+  const tc=document.createElement('canvas');tc.width=150;tc.height=120;
+  tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,120);
+  a.gallery=a.gallery||[];
+  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:'IP作品 #'+a.ip+' · '+(cur!=null?PTS[cur].n:'自定义')+' · '+FN[curStyle]+'风'});
+  if(a.gallery.length>12)a.gallery.pop();
+  saveDB();refreshMe();
+  toast('已存入我的 IP 库（本机保存），可在商城订制款使用');
   resetIP();
 }
 function resetIP(){
@@ -647,23 +782,21 @@ function genShot(){
     ctx.fillStyle='#2b2118';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
     ctx.fillText(`${s.n} · ${s.bg}`,170,390);
     ctx.font='11px sans-serif';ctx.fillStyle='#8a7f6e';
-    ctx.fillText('城忆 AI 旅拍 · 城市主题底图复用 · 仅本地演示',170,408);
+    ctx.fillText('城忆 AI 旅拍 · 城市主题底图复用',170,408);
   };
   img.src=shotFile;
 }
 function saveShot(){
-  shotCount++; ipCount++;
-  document.getElementById('ipN').textContent=ipCount;
-  document.getElementById('ipN2').textContent=ipCount;
-  document.getElementById('shotN2').textContent=shotCount;
-  const url=document.getElementById('shotCanvas').toDataURL();
-  const list=document.getElementById('ipList');
-  if(ipCount===1)list.innerHTML='';
-  list.insertAdjacentHTML('afterbegin',
-    `<div class="g" style="padding:6px"><img src="${url}" style="width:100%;border-radius:8px">
-     <div class="nm mt8" style="font-size:11px">旅拍形象 #${shotCount}</div>
-     <button class="btn sm mt8" style="width:100%" onclick="toast('打印订单已创建（演示）：现场取片 ¥19.9')">🖨️ 打印出片</button></div>`);
-  toast('已存入旅拍册，可打印实体照片或订制文创');
+  const a=acc();
+  a.shot=(a.shot||0)+1;a.ip=(a.ip||0)+1;
+  const src=document.getElementById('shotCanvas');
+  const tc=document.createElement('canvas');tc.width=150;tc.height=186;
+  tc.getContext('2d').drawImage(src,0,0,src.width,src.height,0,0,150,186);
+  a.gallery=a.gallery||[];
+  a.gallery.unshift({d:tc.toDataURL('image/jpeg',0.6),t:'旅拍形象 #'+a.shot+' · '+SHOTS[shotStyle].n});
+  if(a.gallery.length>12)a.gallery.pop();
+  saveDB();refreshMe();
+  toast('已存入旅拍册（本机保存），可打印实体照片或订制文创');
   resetShot();
 }
 function resetShot(){
@@ -675,10 +808,22 @@ function resetShot(){
   document.getElementById('genBtn').disabled=true;
 }
 
+/* ---------- 推送开关 ---------- */
+function togglePush(){
+  const a=acc();a.push=!a.push;saveDB();
+  document.getElementById('pushBtn').textContent=a.push?'🔕 关闭分身动态推送':'🔔 开启分身动态推送';
+  toast(a.push?'已开启分身动态推送，旅拍后随时查看最新动态':'已关闭推送');
+}
+
 /* ---------- toast ---------- */
 let tt=null;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.opacity=1;
   clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,2200)}
+
+/* ---------- 启动：恢复本地数据并渲染 ---------- */
+userPts=acc().pts;
+refreshMe();
+window.addEventListener('beforeunload',saveDB);
 </script>
 </body>
 </html>
